@@ -5,16 +5,21 @@ import AppMenuItem from "./AppMenuItem.vue";
 
 const model = ref([
   {
-    label: "Home",
-    items: [{ label: "Dashboard", icon: "pi pi-fw pi-home", to: "/" }],
+    label: "主控",
+    items: [{ label: "仪表盘", icon: "pi pi-fw pi-home", to: "/" }],
   },
   {
-    label: "Data",
+    label: "数据",
     items: [
       {
-        label: "CourseData",
+        label: "课程数据",
         icon: "pi pi-fw pi-table",
         to: "/data/courseData",
+      },
+      {
+        label: "教师数据",
+        icon: "pi pi-fw pi-table",
+        to: "/data/teacherData",
       },
     ],
   },

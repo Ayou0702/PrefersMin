@@ -27,9 +27,9 @@ onBeforeMount(() => {
     if (response.data.code === 200) {
       toast.add({
         severity: "success",
-        summary: "成功",
+        summary: "数据加载成功",
         detail: response.data.message,
-        life: 3000,
+        life: 3000
       });
     }
   });
@@ -39,14 +39,14 @@ onBeforeMount(() => {
 function getCourseAndTeacherData() {
   request({
     url: "/getCourseData",
-    method: "GET",
+    method: "GET"
   }).then((response) => {
     if (response.data.code !== 200) {
       toast.add({
         severity: "error",
-        summary: "请求课程数据失败",
+        summary: "数据加载失败",
         detail: response.data.message,
-        life: 3000,
+        life: 3000
       });
     }
     courseData.value = response.data.data;
@@ -54,14 +54,14 @@ function getCourseAndTeacherData() {
 
   request({
     url: "/getTeacherData",
-    method: "GET",
+    method: "GET"
   }).then((response) => {
     if (response.data.code !== 200) {
       toast.add({
         severity: "error",
-        summary: "请求教师数据失败",
+        summary: "数据加载失败",
         detail: response.data.message,
-        life: 3000,
+        life: 3000
       });
     }
     teacherData.value = response.data.data;
@@ -72,25 +72,25 @@ function getCurriculumData() {
   loading.value = true;
   return request({
     url: "/getAllNowCurriculumData",
-    method: "GET",
+    method: "GET"
   })
     .then((response) => {
       if (response.data.code !== 200) {
         toast.add({
           severity: "error",
-          summary: "错误",
+          summary: "数据加载失败",
           detail: response.data.message,
-          life: 3000,
+          life: 3000
         });
         return Promise.reject({
-          response: { data: { code: -1, message: response.data.message } },
+          response: { data: { code: -1, message: response.data.message } }
         });
       }
 
       curriculumData.value = response.data.data;
 
       const courseList = [
-        ...new Set(curriculumData.value.map((item) => item.courseId)),
+        ...new Set(curriculumData.value.map((item) => item.courseId))
       ];
 
       courseList.forEach((course) => {
@@ -99,8 +99,8 @@ function getCurriculumData() {
           method: "POST",
           data: {
             avatarType: "courseAvatar",
-            avatarId: course,
-          },
+            avatarId: course
+          }
         }).then((response) => {
           AvatarList.value[course - 1] = response.data;
         });
@@ -112,13 +112,13 @@ function getCurriculumData() {
     .catch((error) => {
       toast.add({
         severity: "error",
-        summary: "错误",
+        summary: "网络异常",
         detail: error.message,
-        life: 3000,
+        life: 3000
       });
       // 失败情况下返回约定错误格式（例如 code 字段为 -1）
       return Promise.reject({
-        response: { data: { code: -1, message: error.message } },
+        response: { data: { code: -1, message: error.message } }
       });
     });
 }
@@ -142,23 +142,22 @@ const saveProduct = () => {
       request({
         url: "/updateCurriculumData",
         method: "POST",
-        data: product.value,
+        data: product.value
       }).then((response) => {
         if (response.data.code === 200) {
           getCurriculumData();
-          // curriculumData.value[curriculumData.value.findIndex(item => item.curriculumId === product.value.curriculumId)] = product.value;
           toast.add({
             severity: "success",
             summary: "修改成功",
             detail: response.data.message,
-            life: 3000,
+            life: 3000
           });
         } else {
           toast.add({
             severity: "error",
             summary: "错误",
             detail: response.data.message,
-            life: 3000,
+            life: 3000
           });
         }
       });
@@ -166,22 +165,22 @@ const saveProduct = () => {
       request({
         url: "/addCurriculumData",
         method: "POST",
-        data: product.value,
+        data: product.value
       }).then((response) => {
         if (response.data.code === 200) {
           toast.add({
             severity: "success",
-            summary: "新增成功",
-            detail: response.data.message,
-            life: 3000,
+            summary: response.data.message,
+            detail: response.data.data,
+            life: 3000
           });
           getCurriculumData();
         } else {
           toast.add({
             severity: "error",
-            summary: "错误",
-            detail: response.data.message,
-            life: 3000,
+            summary: response.data.message,
+            detail: response.data.data,
+            life: 3000
           });
         }
       });
@@ -201,87 +200,64 @@ const confirmDeleteProduct = (editProduct) => {
   deleteProductDialog.value = true;
 };
 
-const deleteProduct = () => {
-  request({
-    url: "/deleteCurriculumData",
-    method: "POST",
-    data: [product.value.curriculumId],
-  }).then((response) => {
-    if (response.data.code === 200) {
-      getCurriculumData();
-      toast.add({
-        severity: "success",
-        summary: "删除成功",
-        detail: response.data.message,
-        life: 3000,
-      });
-    } else {
-      toast.add({
-        severity: "error",
-        summary: "错误",
-        detail: response.data.message,
-        life: 3000,
-      });
-    }
-  });
-  deleteProductDialog.value = false;
-  product.value = {};
-};
-
 const exportCSV = () => {
   dt.value.exportCSV();
+  toast.add({
+    severity: "info",
+    summary: "已将数据导出，请查看下载列表",
+    detail: "若输出导出失败，请更换浏览器重试",
+    life: 3000
+  });
 };
 
-const deleteSelectedProducts = () => {
+const deleteSelectedProducts = (curriculumId) => {
   request({
     url: "/deleteCurriculumData",
     method: "POST",
-    data: [
-      ...selectedProducts.value.map(
-        (selectedProduct) => selectedProduct.curriculumId
-      ),
-    ],
+    data: curriculumId
   }).then((response) => {
     if (response.data.code === 200) {
       getCurriculumData();
       toast.add({
         severity: "success",
-        summary: "删除成功",
-        detail: response.data.message,
-        life: 3000,
+        summary: response.data.message,
+        detail: response.data.data,
+        life: 3000
       });
     } else {
       toast.add({
         severity: "error",
-        summary: "错误",
-        detail: response.data.message,
-        life: 3000,
+        summary: response.data.message,
+        detail: response.data.data,
+        life: 3000
       });
     }
   });
   deleteProductsDialog.value = false;
+  deleteProductDialog.value = false;
   selectedProducts.value = null;
+  product.value = {};
 };
 
 const resetCurriculumData = () => {
   request({
     url: "/resetCurriculumData",
-    method: "GET",
+    method: "GET"
   }).then((response) => {
     if (response.data.code === 200) {
       toast.add({
         severity: "success",
-        summary: "重置成功",
-        detail: response.data.message,
-        life: 3000,
+        summary: response.data.message,
+        detail: response.data.data,
+        life: 3000
       });
       getCurriculumData();
     } else {
       toast.add({
         severity: "error",
-        summary: "错误",
+        summary: "重置失败",
         detail: response.data.message,
-        life: 3000,
+        life: 3000
       });
     }
   });
@@ -289,7 +265,7 @@ const resetCurriculumData = () => {
 };
 const initFilters = () => {
   filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
   };
 };
 </script>
@@ -501,10 +477,8 @@ const initFilters = () => {
             class="mt-0 mx-auto mb-5 block shadow-2"
             width="150"
           />
-          <h5>{{ product.value }}</h5>
-
           <div class="field">
-            <label for="name">课程名称</label>
+            <label>课程名称</label>
             <Dropdown
               id="courseName"
               v-model="product.courseName"
@@ -515,7 +489,7 @@ const initFilters = () => {
             ></Dropdown>
           </div>
           <div class="field">
-            <label for="name">教师名称</label>
+            <label>教师名称</label>
             <Dropdown
               id="teacherName"
               v-model="product.teacherName"
@@ -528,7 +502,7 @@ const initFilters = () => {
 
           <div class="formgrid grid">
             <div class="field col">
-              <label for="quantity">上课地点</label>
+              <label>上课地点</label>
               <InputText
                 id="courseVenue"
                 v-model="product.courseVenue"
@@ -536,7 +510,7 @@ const initFilters = () => {
               />
             </div>
             <div class="field col">
-              <label for="quantity">专业</label>
+              <label>专业</label>
               <ToggleButton
                 v-model="product.courseSpecialized"
                 offLabel="False"
@@ -547,7 +521,7 @@ const initFilters = () => {
 
           <div class="formgrid grid">
             <div class="field col">
-              <label for="quantity">课程周期</label>
+              <label>课程周期</label>
               <InputNumber
                 id="quantity"
                 v-model="product.curriculumPeriod"
@@ -555,7 +529,7 @@ const initFilters = () => {
               />
             </div>
             <div class="field col">
-              <label for="quantity">课程星期</label>
+              <label>课程星期</label>
               <InputNumber
                 id="quantity"
                 v-model="product.curriculumWeek"
@@ -563,7 +537,7 @@ const initFilters = () => {
               />
             </div>
             <div class="field col">
-              <label for="quantity">课程节次</label>
+              <label>课程节次</label>
               <InputNumber
                 id="quantity"
                 v-model="product.curriculumSection"
@@ -596,7 +570,7 @@ const initFilters = () => {
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
             <span v-if="product"
-              >确认要删除课程名称为
+            >确认要删除课程名称为
               <b>{{ product.courseName }} </b> 的课程推送队列数据吗?</span
             >
           </div>
@@ -611,7 +585,7 @@ const initFilters = () => {
               class="p-button-text"
               icon="pi pi-check"
               label="是的"
-              @click="deleteProduct"
+              @click="deleteSelectedProducts([product.curriculumId])"
             />
           </template>
         </Dialog>
@@ -635,12 +609,12 @@ const initFilters = () => {
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
             <span v-if="selectedProducts.length === curriculumData.length"
-              >你确认要删除
+            >你确认要删除
               <b>全部(共{{ selectedProducts.length }}条记录)</b>
               的课程推送队列数据吗?</span
             >
             <span v-else
-              >你选中了
+            >你选中了
               <b>{{ selectedProducts.length }}</b>
               条记录<br />确认要删除这些课程推送队列数据吗?</span
             >
@@ -656,7 +630,9 @@ const initFilters = () => {
               class="p-button-text"
               icon="pi pi-check"
               label="是的"
-              @click="deleteSelectedProducts"
+              @click="deleteSelectedProducts(selectedProducts.map(
+        (selectedProduct) => selectedProduct.curriculumId
+      ))"
             />
           </template>
         </Dialog>
