@@ -3,6 +3,7 @@ import { FilterMatchMode } from "primevue/api";
 import { ref, onBeforeMount } from "vue";
 import request from "@/service/request";
 import { useToast } from "primevue/usetoast";
+import { getAvatar } from "@/service/globalFunctions";
 
 const toast = useToast();
 const dt = ref(null);
@@ -15,11 +16,11 @@ const deleteProductsDialogFailed = ref(false);
 const product = ref({});
 const filters = ref({});
 
-let courseData = ref([]);
+let courseDataList = ref([]);
 let avatarList = ref([]);
 let deleteProductsDialogFailedMessage = ref([]);
 
-// 通过Vue的生命周期函数获取数据库中的线性课表数据
+// 通过Vue的生命周期函数获取数据库中的课程数据
 onBeforeMount(() => {
   initFilters();
   getCourseData().then((response) => {
@@ -41,7 +42,7 @@ function getCourseData() {
     url: "/getCourseData",
     method: "GET"
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.data.code !== 200) {
         toast.add({
           severity: "error",
@@ -54,20 +55,31 @@ function getCourseData() {
         });
       }
 
-      courseData.value = response.data.data;
+      courseDataList.value = response.data.data;
 
-      courseData.value.forEach((courseData) => {
-        request({
-          url: "/getAvatar",
-          method: "POST",
-          data: {
-            avatarType: "courseAvatar",
-            avatarId: courseData.courseId
-          }
-        }).then((response) => {
-          avatarList.value[courseData.courseId - 1] = response.data;
-        });
-      });
+      for (const courseData of courseDataList.value) {
+        await getAvatar(courseData.courseId, "courseAvatar")
+          .then(response => {
+            if (response.data.code === 200) {
+              avatarList.value[courseData.courseId - 1] = response.data.data;
+            } else {
+              toast.add({
+                severity: "warn",
+                summary: response.data.message,
+                detail: response.data.data,
+                life: 4000
+              });
+            }
+          })
+          .catch(error => {
+            toast.add({
+              severity: "error",
+              summary: "网络错误",
+              detail: error.message,
+              life: 3000
+            })
+          });
+      }
 
       loading.value = false;
       return response;
@@ -105,21 +117,21 @@ const saveProduct = () => {
       request({
         url: "/updateCourseData",
         method: "POST",
-        data: [product.value]
+        data: product.value
       }).then((response) => {
         if (response.data.code === 200) {
           getCourseData();
           toast.add({
             severity: "success",
-            summary: "修改成功",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.data,
             life: 3000
           });
         } else {
           toast.add({
             severity: "error",
-            summary: "修改失败",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.data,
             life: 3000
           });
         }
@@ -128,7 +140,7 @@ const saveProduct = () => {
       request({
         url: "/addCourseData",
         method: "POST",
-        data: [product.value]
+        data: product.value
       }).then((response) => {
         if (response.data.code === 200) {
           toast.add({
@@ -209,7 +221,7 @@ function uploadAvatar(event) {
   const formData = new FormData();
 
   formData.append("file", event.files[0]);
-  formData.append("id", product.value.courseId);
+  formData.append("avatarId", product.value.courseId);
   formData.append("avatarType", "courseAvatar");
 
   request({
@@ -224,14 +236,14 @@ function uploadAvatar(event) {
         toast.add({
           severity: "success",
           summary: response.data.message,
-          detail: "课程头像修改成功",
+          detail: response.data.data,
           life: 3000
         });
       } else {
         toast.add({
           severity: "error",
           summary: response.data.message,
-          detail: "课程头像修改失败",
+          detail: response.data.data,
           life: 3000
         });
       }
@@ -292,8 +304,9 @@ function uploadAvatar(event) {
           :paginator="true"
           :rows="10"
           :rowsPerPageOptions="[10, 15, 20]"
-          :value="courseData"
+          :value="courseDataList"
           currentPageReportTemplate="正在展示第 {first} 至 {last} 条记录，共 {totalRecords} 条记录"
+          loadingIcon="pi pi-spin pi-cog"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           responsiveLayout="scroll"
         >
@@ -350,7 +363,7 @@ function uploadAvatar(event) {
           </Column>
           <Column
             :sortable="true"
-            header="专业"
+            header="课程类别"
             headerStyle="width:10%; min-width:10rem;"
           >
             <template #body="slotProps">
@@ -358,14 +371,14 @@ function uploadAvatar(event) {
                 <Tag
                   :icon="
                     slotProps.data.courseSpecialized
-                      ? 'pi pi-check'
-                      : 'pi pi-times'
+                      ? 'pi pi-star'
+                      : 'pi pi-send'
                   "
                   :severity="
-                    slotProps.data.courseSpecialized ? 'success' : 'danger'
+                    slotProps.data.courseSpecialized ? 'info' : 'success'
                   "
                   :value="
-                    slotProps.data.courseSpecialized ? '专业课' : '公共课'
+                    slotProps.data.courseSpecialized ? '专业课程' : '公共课程'
                   "
                   rounded
                 ></Tag>
@@ -435,11 +448,11 @@ function uploadAvatar(event) {
               />
             </div>
             <div class="field col">
-              <label>专业</label>
+              <label>课程类别</label>
               <ToggleButton
                 v-model="product.courseSpecialized"
-                offLabel="False"
-                onLabel="True"
+                offLabel="公共课程"
+                onLabel="专业课程"
               />
             </div>
           </div>
@@ -503,7 +516,7 @@ function uploadAvatar(event) {
         >
           <template #header>
             <div
-              v-if="selectedProducts.length === courseData.length"
+              v-if="selectedProducts.length === courseDataList.length"
               class="p-dialog-title"
             >
               你正在执行很危险的操作！
@@ -514,7 +527,7 @@ function uploadAvatar(event) {
           </template>
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
-            <span v-if="selectedProducts.length === courseData.length"
+            <span v-if="selectedProducts.length === courseDataList.length"
             >你确认要删除
               <b>全部(共{{ selectedProducts.length }}条记录)</b>
               的课程数据吗?</span

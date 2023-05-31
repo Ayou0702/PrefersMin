@@ -3,6 +3,7 @@ import { FilterMatchMode } from "primevue/api";
 import { ref, onBeforeMount } from "vue";
 import request from "@/service/request";
 import { useToast } from "primevue/usetoast";
+import { getAvatar } from "@/service/globalFunctions";
 
 const toast = useToast();
 const dt = ref(null);
@@ -15,15 +16,17 @@ const resetCurriculumDataDialog = ref(false);
 const product = ref({});
 const filters = ref({});
 
-let curriculumData = ref([]);
+let curriculumDataList = ref([]);
 let courseData = ref([]);
+let courseNameGroup = ref([]);
 let teacherData = ref([]);
-let AvatarList = ref([]);
+let teacherNameGroup = ref([]);
+let avatarList = ref([]);
 
 // 通过Vue的生命周期函数获取数据库中的线性课表数据
-onBeforeMount(() => {
+onBeforeMount(async () => {
   initFilters();
-  getCurriculumData().then((response) => {
+  await getCurriculumData().then((response) => {
     if (response.data.code === 200) {
       toast.add({
         severity: "success",
@@ -33,10 +36,11 @@ onBeforeMount(() => {
       });
     }
   });
-  getCourseAndTeacherData();
+  await getCourseData();
+  await getTeacherData();
 });
 
-function getCourseAndTeacherData() {
+const getCourseData = () => {
   request({
     url: "/getCourseData",
     method: "GET"
@@ -50,8 +54,18 @@ function getCourseAndTeacherData() {
       });
     }
     courseData.value = response.data.data;
+    courseNameGroup.value.push({
+      label: "专业课程",
+      items: courseData.value.filter(item => item.courseSpecialized === true)
+    });
+    courseNameGroup.value.push({
+      label: "公共课程",
+      items: courseData.value.filter(item => item.courseSpecialized === false)
+    });
   });
+};
 
+const getTeacherData = () => {
   request({
     url: "/getTeacherData",
     method: "GET"
@@ -65,16 +79,24 @@ function getCourseAndTeacherData() {
       });
     }
     teacherData.value = response.data.data;
+    teacherNameGroup.value.push({
+      label: "专业教师",
+      items: teacherData.value.filter(item => item.teacherSpecialized === true)
+    });
+    teacherNameGroup.value.push({
+      label: "公共教师",
+      items: teacherData.value.filter(item => item.teacherSpecialized === false)
+    });
   });
-}
+};
 
 function getCurriculumData() {
   loading.value = true;
   return request({
-    url: "/getAllNowCurriculumData",
+    url: "/queryAllCurriculumData",
     method: "GET"
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.data.code !== 200) {
         toast.add({
           severity: "error",
@@ -87,24 +109,35 @@ function getCurriculumData() {
         });
       }
 
-      curriculumData.value = response.data.data;
+      curriculumDataList.value = response.data.data;
 
-      const courseList = [
-        ...new Set(curriculumData.value.map((item) => item.courseId))
+      const courseIdList = [
+        ...new Set(curriculumDataList.value.map((item) => item.courseId))
       ];
 
-      courseList.forEach((course) => {
-        request({
-          url: "/getAvatar",
-          method: "POST",
-          data: {
-            avatarType: "courseAvatar",
-            avatarId: course
-          }
-        }).then((response) => {
-          AvatarList.value[course - 1] = response.data;
-        });
-      });
+      for (const courseId of courseIdList) {
+        await getAvatar(courseId, "courseAvatar")
+          .then(response => {
+            if (response.data.code === 200) {
+              avatarList.value[courseId - 1] = response.data.data;
+            } else {
+              toast.add({
+                severity: "warn",
+                summary: response.data.message,
+                detail: response.data.data,
+                life: 3000
+              });
+            }
+          })
+          .catch(error => {
+            toast.add({
+              severity: "error",
+              summary: "网络错误",
+              detail: error.message,
+              life: 3000
+            })
+          });
+      }
 
       loading.value = false;
       return response;
@@ -328,8 +361,9 @@ const initFilters = () => {
           :paginator="true"
           :rows="5"
           :rowsPerPageOptions="[5, 10, 15, 20]"
-          :value="curriculumData"
+          :value="curriculumDataList"
           currentPageReportTemplate="正在展示第 {first} 至 {last} 条记录，共 {totalRecords} 条记录"
+          loadingIcon="pi pi-spin pi-cog"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           responsiveLayout="scroll"
         >
@@ -355,7 +389,7 @@ const initFilters = () => {
             <template #body="slotProps">
               <div class="flex ml-5 flex-row">
                 <Avatar
-                  :image="AvatarList[slotProps.data.courseId - 1]"
+                  :image="avatarList[slotProps.data.courseId - 1]"
                   shape="circle"
                   size="xlarge"
                 />
@@ -410,7 +444,7 @@ const initFilters = () => {
           </Column>
           <Column
             :sortable="true"
-            header="专业"
+            header="课程类别"
             headerStyle="width:8%; min-width:10rem;"
           >
             <template #body="slotProps">
@@ -418,14 +452,14 @@ const initFilters = () => {
                 <Tag
                   :icon="
                     slotProps.data.courseSpecialized
-                      ? 'pi pi-check'
-                      : 'pi pi-times'
+                      ? 'pi pi-star'
+                      : 'pi pi-send'
                   "
                   :severity="
-                    slotProps.data.courseSpecialized ? 'success' : 'danger'
+                    slotProps.data.courseSpecialized ? 'info' : 'success'
                   "
                   :value="
-                    slotProps.data.courseSpecialized ? '专业课' : '公共课'
+                    slotProps.data.courseSpecialized ? '专业课程' : '公共课程'
                   "
                   rounded
                 ></Tag>
@@ -473,7 +507,7 @@ const initFilters = () => {
           <img
             v-if="product.curriculumId"
             :alt="product.image"
-            :src="AvatarList[product.courseId - 1]"
+            :src="avatarList[product.courseId - 1]"
             class="mt-0 mx-auto mb-5 block shadow-2"
             width="150"
           />
@@ -482,22 +516,70 @@ const initFilters = () => {
             <Dropdown
               id="courseName"
               v-model="product.courseName"
-              :options="courseData"
+              :options="courseNameGroup"
+              optionGroupChildren="items"
+              optionGroupLabel="label"
               optionLabel="courseName"
               optionValue="courseName"
               placeholder="选择课程名称"
-            ></Dropdown>
+            >
+              <template #optiongroup="slotProps">
+                <div class="flex align-items-center">
+                  <Tag
+                    :icon="
+                    slotProps.option.label === '专业课程'
+                      ? 'pi pi-star'
+                      : 'pi pi-send'
+                  "
+                    :severity="
+                    slotProps.option.label === '专业课程' ? 'info' : 'success'
+                  "
+                    :value="
+                    slotProps.option.label === '专业课程' ? '专业课程' : '公共课程'
+                  "
+                    rounded
+                  ></Tag>
+                </div>
+              </template>
+              <template #option="slotProp">
+                <div class="ml-5">{{ slotProp.option.courseName }}</div>
+              </template>
+            </Dropdown>
           </div>
           <div class="field">
             <label>教师名称</label>
             <Dropdown
               id="teacherName"
               v-model="product.teacherName"
-              :options="teacherData"
+              :options="teacherNameGroup"
+              optionGroupChildren="items"
+              optionGroupLabel="label"
               optionLabel="teacherName"
               optionValue="teacherName"
               placeholder="选择教师名称"
-            ></Dropdown>
+            >
+              <template #optiongroup="slotProps">
+                <div class="flex align-items-center">
+                  <Tag
+                    :icon="
+                    slotProps.option.label === '专业教师'
+                      ? 'pi pi-star'
+                      : 'pi pi-send'
+                  "
+                    :severity="
+                    slotProps.option.label === '专业教师' ? 'info' : 'success'
+                  "
+                    :value="
+                    slotProps.option.label === '专业教师' ? '专业教师' : '公共教师'
+                  "
+                    rounded
+                  ></Tag>
+                </div>
+              </template>
+              <template #option="slotProp">
+                <div class="ml-5">{{ slotProp.option.teacherName }}</div>
+              </template>
+            </Dropdown>
           </div>
 
           <div class="formgrid grid">
@@ -510,11 +592,11 @@ const initFilters = () => {
               />
             </div>
             <div class="field col">
-              <label>专业</label>
+              <label>课程类别</label>
               <ToggleButton
                 v-model="product.courseSpecialized"
-                offLabel="False"
-                onLabel="True"
+                offLabel="公共课程"
+                onLabel="专业课程"
               />
             </div>
           </div>
@@ -531,7 +613,6 @@ const initFilters = () => {
             <div class="field col">
               <label>课程星期</label>
               <InputNumber
-                id="quantity"
                 v-model="product.curriculumWeek"
                 integeronly
               />
@@ -539,7 +620,6 @@ const initFilters = () => {
             <div class="field col">
               <label>课程节次</label>
               <InputNumber
-                id="quantity"
                 v-model="product.curriculumSection"
                 integeronly
               />
@@ -597,7 +677,7 @@ const initFilters = () => {
         >
           <template #header>
             <div
-              v-if="selectedProducts.length === curriculumData.length"
+              v-if="selectedProducts.length === curriculumDataList.length"
               class="p-dialog-title"
             >
               你正在执行很危险的操作！
@@ -608,7 +688,7 @@ const initFilters = () => {
           </template>
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
-            <span v-if="selectedProducts.length === curriculumData.length"
+            <span v-if="selectedProducts.length === curriculumDataList.length"
             >你确认要删除
               <b>全部(共{{ selectedProducts.length }}条记录)</b>
               的课程推送队列数据吗?</span

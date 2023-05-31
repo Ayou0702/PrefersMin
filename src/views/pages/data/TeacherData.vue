@@ -3,6 +3,7 @@ import { FilterMatchMode } from "primevue/api";
 import { ref, onBeforeMount } from "vue";
 import request from "@/service/request";
 import { useToast } from "primevue/usetoast";
+import { getAvatar } from "@/service/globalFunctions";
 
 const toast = useToast();
 const dt = ref(null);
@@ -15,11 +16,11 @@ const deleteProductsDialogFailed = ref(false);
 const product = ref({});
 const filters = ref({});
 
-let teacherData = ref([]);
+let teacherDataList = ref([]);
 let avatarList = ref([]);
 let deleteProductsDialogFailedMessage = ref([]);
 
-// 通过Vue的生命周期函数获取数据库中的线性课表数据
+// 通过Vue的生命周期函数获取数据库中的教师数据
 onBeforeMount(() => {
   initFilters();
   getTeacherData().then((response) => {
@@ -41,11 +42,11 @@ function getTeacherData() {
     url: "/getTeacherData",
     method: "GET"
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.data.code !== 200) {
         toast.add({
           severity: "error",
-          summary: "数据加载成功",
+          summary: "数据加载失败",
           detail: response.data.message,
           life: 3000
         });
@@ -54,20 +55,31 @@ function getTeacherData() {
         });
       }
 
-      teacherData.value = response.data.data;
+      teacherDataList.value = response.data.data;
 
-      teacherData.value.forEach((teacherData) => {
-        request({
-          url: "/getAvatar",
-          method: "POST",
-          data: {
-            avatarType: "teacherAvatar",
-            avatarId: teacherData.teacherId
-          }
-        }).then((response) => {
-          avatarList.value[teacherData.teacherId - 1] = response.data;
-        });
-      });
+      for (const teacherData of teacherDataList.value) {
+        await getAvatar(teacherData.teacherId, "teacherAvatar")
+          .then(response => {
+            if (response.data.code === 200) {
+              avatarList.value[teacherData.teacherId - 1] = response.data.data;
+            } else {
+              toast.add({
+                severity: "warn",
+                summary: response.data.message,
+                detail: response.data.data,
+                life: 4000
+              });
+            }
+          })
+          .catch(error => {
+            toast.add({
+              severity: "error",
+              summary: "网络错误",
+              detail: error.message,
+              life: 3000
+            });
+          });
+      }
 
       loading.value = false;
       return response;
@@ -207,7 +219,7 @@ function uploadAvatar(event) {
   const formData = new FormData();
 
   formData.append("file", event.files[0]);
-  formData.append("id", product.value.teacherId);
+  formData.append("avatarId", product.value.teacherId);
   formData.append("avatarType", "teacherAvatar");
 
   request({
@@ -290,8 +302,9 @@ function uploadAvatar(event) {
           :paginator="true"
           :rows="10"
           :rowsPerPageOptions="[10, 15, 20]"
-          :value="teacherData"
+          :value="teacherDataList"
           currentPageReportTemplate="正在展示第 {first} 至 {last} 条记录，共 {totalRecords} 条记录"
+          loadingIcon="pi pi-spin pi-cog"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           responsiveLayout="scroll"
         >
@@ -359,7 +372,7 @@ function uploadAvatar(event) {
           </Column>
           <Column
             :sortable="true"
-            header="专业"
+            header="教师类别"
             headerStyle="width:10%; min-width:10rem;"
           >
             <template #body="slotProps">
@@ -367,14 +380,14 @@ function uploadAvatar(event) {
                 <Tag
                   :icon="
                     slotProps.data.teacherSpecialized
-                      ? 'pi pi-check'
-                      : 'pi pi-times'
+                      ? 'pi pi-star'
+                      : 'pi pi-send'
                   "
                   :severity="
-                    slotProps.data.teacherSpecialized ? 'success' : 'danger'
+                    slotProps.data.teacherSpecialized ? 'info' : 'success'
                   "
                   :value="
-                    slotProps.data.teacherSpecialized ? '时' : '否'
+                    slotProps.data.teacherSpecialized ? '专业教师' : '公共教师'
                   "
                   rounded
                 ></Tag>
@@ -453,11 +466,11 @@ function uploadAvatar(event) {
               />
             </div>
             <div class="field col">
-              <label>专业</label>
+              <label>教师类别</label>
               <ToggleButton
                 v-model="product.teacherSpecialized"
-                offLabel="False"
-                onLabel="True"
+                offLabel="公共教师"
+                onLabel="专业教师"
               />
             </div>
           </div>
@@ -521,7 +534,7 @@ function uploadAvatar(event) {
         >
           <template #header>
             <div
-              v-if="selectedProducts.length === teacherData.length"
+              v-if="selectedProducts.length === teacherDataList.length"
               class="p-dialog-title"
             >
               你正在执行很危险的操作！
@@ -532,7 +545,7 @@ function uploadAvatar(event) {
           </template>
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
-            <span v-if="selectedProducts.length === teacherData.length"
+            <span v-if="selectedProducts.length === teacherDataList.length"
             >你确认要删除
               <b>全部(共{{ selectedProducts.length }}条记录)</b>
               的教师数据吗?</span

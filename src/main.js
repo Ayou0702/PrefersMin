@@ -105,6 +105,8 @@ import BlockViewer from "@/components/BlockViewer.vue";
 
 import "@/assets/styles.scss";
 
+import globalFunctionPlugin from '@/service/globalFunctionPlugin' //全局函数模块
+
 const app = createApp(App);
 
 app.use(router);
@@ -112,6 +114,7 @@ app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);
+app.use(globalFunctionPlugin);
 
 app.directive("tooltip", Tooltip);
 app.directive("badge", BadgeDirective);
