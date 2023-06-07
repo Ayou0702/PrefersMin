@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useLayout } from "@/layout/composables/layout";
 import { useRouter } from "vue-router";
 
-const { layoutConfig, onMenuToggle } = useLayout();
+const { onMenuToggle } = useLayout();
 
 const outsideClickListener = ref(null);
 const topBarMenuActive = ref(false);
@@ -15,12 +15,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   unbindOutsideClickListener();
-});
-
-const logoUrl = computed(() => {
-  return `layout/images/${
-    layoutConfig.darkTheme.value ? "logo-white" : "logo-dark"
-  }.svg`;
 });
 
 const onTopBarMenuButton = () => {
@@ -46,12 +40,14 @@ const bindOutsideClickListener = () => {
     document.addEventListener("click", outsideClickListener.value);
   }
 };
+
 const unbindOutsideClickListener = () => {
   if (outsideClickListener.value) {
     document.removeEventListener("click", outsideClickListener);
     outsideClickListener.value = null;
   }
 };
+
 const isOutsideClicked = (event) => {
   if (!topBarMenuActive.value) return;
 
@@ -65,12 +61,13 @@ const isOutsideClicked = (event) => {
     topBarEl.contains(event.target)
   );
 };
+
 </script>
 
 <template>
   <div class="layout-topbar">
     <div class="layout-topbar-logo" @click="onMenuToggle()">
-      <img :src="logoUrl" alt="logo" />
+      <img src="../../public/layout/images/logo.svg" alt="logo" />
       <span>PrefersMin</span>
     </div>
 

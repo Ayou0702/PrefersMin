@@ -79,3 +79,8 @@
         color: #694382;
     }
 }
+
+//表格表头居中
+:deep(.p-column-header-content) {
+    justify-content: center;
+}

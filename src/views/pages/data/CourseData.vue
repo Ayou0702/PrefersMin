@@ -20,7 +20,6 @@ let courseDataList = ref([]);
 let avatarList = ref([]);
 let deleteProductsDialogFailedMessage = ref([]);
 
-// 通过Vue的生命周期函数获取数据库中的课程数据
 onBeforeMount(() => {
   initFilters();
   getCourseData().then((response) => {
@@ -586,9 +585,4 @@ function uploadAvatar(event) {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/badges";
-
-//表格表头居中
-:deep(.p-column-header-content) {
-  justify-content: center;
-}
 </style>

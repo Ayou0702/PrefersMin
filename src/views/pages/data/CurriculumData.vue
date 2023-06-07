@@ -23,7 +23,6 @@ let teacherData = ref([]);
 let teacherNameGroup = ref([]);
 let avatarList = ref([]);
 
-// 通过Vue的生命周期函数获取数据库中的线性课表数据
 onBeforeMount(async () => {
   initFilters();
   await getCurriculumData().then((response) => {
@@ -93,7 +92,7 @@ const getTeacherData = () => {
 function getCurriculumData() {
   loading.value = true;
   return request({
-    url: "/queryAllCurriculumData",
+    url: "/getAllNowCurriculumData",
     method: "GET"
   })
     .then(async (response) => {
@@ -135,7 +134,7 @@ function getCurriculumData() {
               summary: "网络错误",
               detail: error.message,
               life: 3000
-            })
+            });
           });
       }
 
@@ -517,6 +516,7 @@ const initFilters = () => {
               id="courseName"
               v-model="product.courseName"
               :options="courseNameGroup"
+              editable
               optionGroupChildren="items"
               optionGroupLabel="label"
               optionLabel="courseName"
@@ -552,6 +552,7 @@ const initFilters = () => {
               id="teacherName"
               v-model="product.teacherName"
               :options="teacherNameGroup"
+              editable
               optionGroupChildren="items"
               optionGroupLabel="label"
               optionLabel="teacherName"
@@ -749,9 +750,4 @@ const initFilters = () => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/badges";
-
-//表格表头居中
-:deep(.p-column-header-content) {
-  justify-content: center;
-}
 </style>

@@ -20,7 +20,6 @@ let teacherDataList = ref([]);
 let avatarList = ref([]);
 let deleteProductsDialogFailedMessage = ref([]);
 
-// 通过Vue的生命周期函数获取数据库中的教师数据
 onBeforeMount(() => {
   initFilters();
   getTeacherData().then((response) => {
@@ -115,7 +114,7 @@ const saveProduct = () => {
       request({
         url: "/updateTeacherData",
         method: "POST",
-        data: [product.value]
+        data: product.value
       }).then((response) => {
         if (response.data.code === 200) {
           getTeacherData();
@@ -138,7 +137,7 @@ const saveProduct = () => {
       request({
         url: "/addTeacherData",
         method: "POST",
-        data: [product.value]
+        data: product.value
       }).then((response) => {
         if (response.data.code === 200) {
           toast.add({
@@ -234,14 +233,14 @@ function uploadAvatar(event) {
         toast.add({
           severity: "success",
           summary: response.data.message,
-          detail: "教师头像修改成功",
+          detail: response.data.data,
           life: 3000
         });
       } else {
         toast.add({
           severity: "error",
           summary: response.data.message,
-          detail: "教师头像修改失败",
+          detail: response.data.data,
           life: 3000
         });
       }
@@ -604,9 +603,4 @@ function uploadAvatar(event) {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/badges";
-
-//表格表头居中
-:deep(.p-column-header-content) {
-  justify-content: center;
-}
 </style>
