@@ -300,7 +300,7 @@ function uploadAvatar(event) {
           v-model:selection="selectedProducts"
           :filters="filters"
           :loading="loading"
-          :paginator="true"
+          paginator
           :rows="10"
           :rowsPerPageOptions="[10, 15, 20]"
           :value="courseDataList"
@@ -311,7 +311,7 @@ function uploadAvatar(event) {
         >
           <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
           <Column
-            :sortable="true"
+            sortable
             class="vertical-align-middle"
             field="courseId"
             header="课程ID"
@@ -361,7 +361,8 @@ function uploadAvatar(event) {
             </template>
           </Column>
           <Column
-            :sortable="true"
+            sortable
+            field="courseSpecialized"
             header="课程类别"
             headerStyle="width:10%; min-width:10rem;"
           >
@@ -412,7 +413,7 @@ function uploadAvatar(event) {
 
         <Dialog
           v-model:visible="productDialog"
-          :modal="true"
+          modal
           class="p-fluid w-3"
         >
           <template #header>
@@ -481,7 +482,7 @@ function uploadAvatar(event) {
 
         <Dialog
           v-model:visible="deleteProductDialog"
-          :modal="true"
+          modal
           class="w-auto"
           header="确认删除吗?"
         >
@@ -510,7 +511,7 @@ function uploadAvatar(event) {
 
         <Dialog
           v-model:visible="deleteProductsDialog"
-          :modal="true"
+          modal
           class="w-3"
         >
           <template #header>
@@ -557,7 +558,7 @@ function uploadAvatar(event) {
 
         <Dialog
           v-model:visible="deleteProductsDialogFailed"
-          :modal="true"
+          modal
           class="w-auto"
           header="课程数据删除失败"
         >

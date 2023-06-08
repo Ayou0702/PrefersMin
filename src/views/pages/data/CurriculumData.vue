@@ -357,7 +357,7 @@ const initFilters = () => {
           v-model:selection="selectedProducts"
           :filters="filters"
           :loading="loading"
-          :paginator="true"
+          paginator
           :rows="5"
           :rowsPerPageOptions="[5, 10, 15, 20]"
           :value="curriculumDataList"
@@ -368,7 +368,7 @@ const initFilters = () => {
         >
           <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
           <Column
-            :sortable="true"
+            sortable
             class="vertical-align-middle"
             field="curriculumId"
             header="序列ID"
@@ -442,7 +442,8 @@ const initFilters = () => {
             </template>
           </Column>
           <Column
-            :sortable="true"
+            sortable
+            field="courseSpecialized"
             header="课程类别"
             headerStyle="width:8%; min-width:10rem;"
           >
@@ -494,7 +495,7 @@ const initFilters = () => {
 
         <Dialog
           v-model:visible="productDialog"
-          :modal="true"
+          modal
           class="p-fluid w-3"
         >
           <template #header>
@@ -644,7 +645,7 @@ const initFilters = () => {
 
         <Dialog
           v-model:visible="deleteProductDialog"
-          :modal="true"
+          modal
           class="w-auto"
           header="确认删除吗?"
         >
@@ -673,7 +674,7 @@ const initFilters = () => {
 
         <Dialog
           v-model:visible="deleteProductsDialog"
-          :modal="true"
+          modal
           class="w-3"
         >
           <template #header>
@@ -720,7 +721,7 @@ const initFilters = () => {
 
         <Dialog
           v-model:visible="resetCurriculumDataDialog"
-          :modal="true"
+          modal
           class="w-3"
           header="重置课程推送队列"
         >

@@ -66,7 +66,7 @@ const isOutsideClicked = (event) => {
 
 <template>
   <div class="layout-topbar">
-    <div class="layout-topbar-logo" @click="onMenuToggle()">
+    <div class="layout-topbar-logo ml-5" @click="onMenuToggle()">
       <img src="../../public/layout/images/logo.svg" alt="logo" />
       <span>PrefersMin</span>
     </div>
