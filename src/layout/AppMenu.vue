@@ -28,6 +28,16 @@ const model = ref([
       },
     ],
   },
+  {
+    label: "工具",
+    items: [
+      {
+        label: "月下图库",
+        icon: "pi pi-fw pi-table",
+        to: "/util/moonPhoto",
+      },
+    ],
+  },
 ]);
 </script>
 

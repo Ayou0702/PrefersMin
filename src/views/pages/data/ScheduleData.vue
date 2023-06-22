@@ -299,6 +299,7 @@ const deleteSelectedProducts = (scheduleId) => {
         >
           <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
           <Column
+            field="scheduleId"
             class="vertical-align-middle"
             header="课表ID"
             headerStyle="width:3%; min-width:10rem;"
@@ -322,7 +323,7 @@ const deleteSelectedProducts = (scheduleId) => {
           </Column>
           <Column
             header="教师名称"
-            headerStyle="width:25%; min-width:8rem;"
+            headerStyle="width:15%; min-width:8rem;"
           >
             <template #body="slotProps">
               <div class="font-bold text-base text-center">
@@ -332,7 +333,7 @@ const deleteSelectedProducts = (scheduleId) => {
           </Column>
           <Column
             header="课程周期"
-            headerStyle="width:10%; min-width:8rem;"
+            headerStyle="width:15%; min-width:8rem;"
           >
             <template #body="slotProps">
               <div class="font-bold text-base text-center">
@@ -352,7 +353,7 @@ const deleteSelectedProducts = (scheduleId) => {
           </Column>
           <Column
             header="课程节次"
-            headerStyle="width:10%; min-width:8rem;"
+            headerStyle="width:15%; min-width:8rem;"
           >
             <template #body="slotProps">
               <div class="font-bold text-base text-center">
