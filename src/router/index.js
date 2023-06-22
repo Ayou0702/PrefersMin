@@ -29,6 +29,11 @@ const router = createRouter({
           name: "teacherData",
           component: () => import("@/views/pages/data/TeacherData.vue")
         },
+        {
+          path: "/data/scheduleData",
+          name: "scheduleData",
+          component: () => import("@/views/pages/data/ScheduleData.vue")
+        },
       ]
     },
     {

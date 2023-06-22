@@ -21,6 +21,11 @@ const model = ref([
         icon: "pi pi-fw pi-table",
         to: "/data/teacherData",
       },
+      {
+        label: "课表数据",
+        icon: "pi pi-fw pi-table",
+        to: "/data/scheduleData",
+      },
     ],
   },
 ]);
