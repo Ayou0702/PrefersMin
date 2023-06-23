@@ -100,15 +100,14 @@ import TreeTable from "primevue/treetable";
 import TriStateCheckbox from "primevue/tristatecheckbox";
 import VirtualScroller from "primevue/virtualscroller";
 
-import CodeHighlight from "@/components/CodeHighlight.vue";
-import BlockViewer from "@/components/BlockViewer.vue";
-
 import "@/assets/styles.scss";
 
 import globalFunctionPlugin from '@/service/globalFunctionPlugin' //全局函数模块
+import VueVirtualScroller from "vue-virtual-scroller";
 
 const app = createApp(App);
 
+app.use(VueVirtualScroller);
 app.use(router);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
@@ -120,9 +119,6 @@ app.directive("tooltip", Tooltip);
 app.directive("badge", BadgeDirective);
 app.directive("ripple", Ripple);
 app.directive("styleclass", StyleClass);
-
-app.component("CodeHighlight", CodeHighlight);
-app.component("BlockViewer", BlockViewer);
 
 app.component("Accordion", Accordion);
 app.component("AccordionTab", AccordionTab);

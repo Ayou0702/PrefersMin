@@ -1,14 +1,14 @@
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import request from "@/service/request";
+import PhotoView from "@/components/PhotoView.vue";
 
-const fileInfos = ref([]);
-const layout = ref("grid");
 const shibboleth = ref("");
+const urlList = ref([]);
 
 function download() {
 
-  fileInfos.value.length = 0;
+  urlList.value.length = 0;
   request({
     url: "https://xt.guxitk.com/api/merchant/authorByCode",
     method: "GET",
@@ -71,7 +71,7 @@ function download() {
 
                 const coverUrlList = records.value.map((record) => record.cover_url);
 
-                updatePreviews(coverUrlList);
+                urlList.value.push(...coverUrlList);
               });
 
           });
@@ -82,50 +82,55 @@ function download() {
 
 }
 
-const updatePreviews = async (coverUrlList) => {
-  coverUrlList.map(async (url) => {
-    const img = new Image();
-    img.src = url;
-    await img.decode();
-    fileInfos.value[coverUrlList.indexOf(url)] = ({
-      name: url.substring(url.lastIndexOf("-") + 1),
-      size: `${img.width}x${img.height}`,
-      suffix: url.substring(url.lastIndexOf(".") + 1).toUpperCase(),
-      link: url,
-      previewEnabled: img
-    });
-  });
-  console.log(fileInfos.value);
-};
+const show = ref(true);
+const waterfallWrapper = ref(null);
+const wrapperWidth = computed(() => {
+  return waterfallWrapper.value.offsetWidth;
+});
+const wrapperHeight = ref(0);
+// 间隙
+const gutter = ref(20);
+// 单列宽
+const colWidth = ref(350);
+// 列数
+const cols = computed(() => {
+  return Math.floor((wrapperWidth.value - gutter.value) / (colWidth.value + gutter.value));
+});
+// x偏移
+const offsetX = computed(() => {
+  const contextWidth = cols.value * (colWidth.value + gutter.value) + gutter.value;
+  return (wrapperWidth.value - contextWidth) / 2;
+});
 
-function downloadPic(link, name) {
-  console.log(link)
-  // 创建 XMLHttpRequest 对象
-  const xhr = new XMLHttpRequest();
-
-  // 设置请求方法和请求地址
-  xhr.open('GET', link);
-
-  // 设置 responseType 属性为 blob 对象
-  xhr.responseType = 'blob';
-
-  // 请求成功后触发的事件
-  xhr.onload = () => {
-    // 创建 blob 对象
-    const blob = new Blob([xhr.response], {type: "application/octet-stream"});
-
-    // 创建 <a> 标签用于下载文件
-    const a = document.createElement('a');
-    const objectUrl = URL.createObjectURL(blob);
-    a.href = objectUrl;
-    a.download = name || 'download';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(objectUrl);
+function layout() {
+  // 初始化 y 集合
+  const posY = new Array(cols.value).fill(gutter.value);
+  // 节点
+  const items = document.querySelectorAll(".waterfall-item");
+  // 遍历
+  for (let i = 0; i < items.length; i++) {
+    const curItem = items[i];
+    // 最小的y值
+    const minY = Math.min.apply(null, posY);
+    // 最小y的下标
+    const minYIndex = posY.indexOf(minY);
+    // 当前下标对应的x
+    const curX = gutter.value * (minYIndex + 1) + colWidth.value * minYIndex + offsetX.value;
+    // 设置偏移
+    curItem.style.transform = `translate3d(${curX}px,${minY}px, 0)`;
+    curItem.style.width = `${colWidth.value}px`;
+    // 更新当前index的y值
+    const height = curItem.offsetHeight;
+    posY[minYIndex] += height + gutter.value;
   }
-  // 发送请求
-  xhr.send();
+
+  // 设置容器高度
+  wrapperHeight.value = Math.max.apply(null, posY);
+
+}
+
+const imageLoad = () => {
+  layout()
 }
 </script>
 
@@ -141,59 +146,15 @@ function downloadPic(link, name) {
         </div>
         <Button label="全部保存" @click="" />
       </div>
-      <div class="col-6 text-right">
-        <DataViewLayoutOptions v-model="layout" />
-      </div>
     </div>
     <Divider />
-    <DataView :layout="layout" :rows="fileInfos.length" :value="fileInfos">
-      <template #list="slotProps">
-        <div class="col-12">
-          <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
-            <img :alt="slotProps.data.name" :src="slotProps.data.link"
-                 class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5" />
-            <div class="flex-1 text-center md:text-left">
-              <div class="font-bold text-2xl">{{ slotProps.data.name }}</div>
-              <div class="mb-3">{{ slotProps.data.description }}</div>
-              <div class="flex align-items-center">
-                <i class="pi pi-tag mr-2"/>
-                <span class="font-semibold">{{ slotProps.data.suffix }}</span>
-              </div>
-            </div>
-            <div
-              class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0">
-              <span class="text-2xl font-semibold mb-2 align-self-center md:align-self-end">{{ slotProps.data.size }}</span>
-              <Button class="mb-2"
-                      icon="pi pi-download" label="Add to Cart"></Button>
-              <span class="product-badge">{{ slotProps.data.inventoryStatus }}</span>
-            </div>
-          </div>
-        </div>
-      </template>
 
-      <template #grid="slotProps">
-        <div class="col-12 md:col-3">
-          <div class="card m-3 border-1 surface-border">
-            <div class="flex align-items-center justify-content-between">
-              <div class="flex align-items-center">
-                <i class="pi pi-bookmark mr-2"/>
-                <span class="font-semibold">{{ slotProps.data.suffix }}</span>
-              </div>
-              <span :class="'product-badge status-' + slotProps.data">{{ slotProps.data.size }}</span>
-            </div>
-            <div class="text-center">
-              <img :alt="slotProps.data.name" :src="slotProps.data.link" class="w-full shadow-2 my-3 mx-0" />
-            </div>
-            <div class="flex align-items-center justify-content-between">
-              <div class="sf">
-                <i class="pi pi-tag mr-2"/>
-                <span class="text-xl font-bold">{{ slotProps.data.name }}</span>
-              </div>
-              <Button icon="pi pi-download" @click=downloadPic(slotProps.data.link,slotProps.data.name)></Button>
-            </div>
-          </div>
+    <perfect-scrollbar :disabled="show">
+      <div ref="waterfallWrapper" :style="{ height: `${wrapperHeight}px` }" style="position: relative;">
+        <div v-for="item in urlList" class="waterfall-item absolute">
+          <PhotoView :url="item" @load="imageLoad"/>
         </div>
-      </template>
-    </DataView>
+      </div>
+    </perfect-scrollbar>
   </div>
 </template>
