@@ -33,8 +33,13 @@ const model = ref([
     items: [
       {
         label: "月下图库",
-        icon: "pi pi-fw pi-table",
+        icon: "pi pi-fw pi-images",
         to: "/util/moonPhoto",
+      },
+      {
+        label: "云图库",
+        icon: "pi pi-fw pi-images",
+        to: "/util/cloudPhoto",
       },
     ],
   },

@@ -130,14 +130,14 @@ function layout() {
 }
 
 const imageLoad = () => {
-  layout()
-}
+  layout();
+};
 </script>
 
 <template>
   <div class="card">
     <div class="grid grid-nogutter">
-      <div class="col-6 text-left flex flex-row">
+      <div class="w-5 col-6 text-left flex flex-row">
         <div class="p-inputgroup w-8 mr-3">
           <InputText
             v-model="shibboleth"
@@ -151,9 +151,11 @@ const imageLoad = () => {
 
     <perfect-scrollbar :disabled="show">
       <div ref="waterfallWrapper" :style="{ height: `${wrapperHeight}px` }" style="position: relative;">
-        <div v-for="item in urlList" class="waterfall-item absolute">
-          <PhotoView :url="item" @load="imageLoad"/>
-        </div>
+        <keep-alive>
+          <div v-for="item in urlList" class="waterfall-item absolute">
+            <PhotoView :url="item" @load="imageLoad" />
+          </div>
+        </keep-alive>
       </div>
     </perfect-scrollbar>
   </div>

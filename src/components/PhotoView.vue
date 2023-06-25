@@ -8,12 +8,12 @@
       <span class="product-badge">{{ width }}x{{ height }}</span>
     </div>
     <div class="text-center">
-      <img :alt="name" :src="url" class="w-full shadow-2 my-3 mx-0 ayou" ref="image" @load="$emit('load')"/>
+      <img :alt="name" :src="url" class="w-full shadow-2 my-3 mx-0" ref="image" @load="$emit('load')"/>
     </div>
     <div class="flex align-items-center justify-content-between">
       <div class="sf">
         <i class="pi pi-tag mr-2" />
-        <span class="text-xl font-bold">{{ name }}</span>
+        <span class="text-xl font-bold">{{ displayName }}</span>
       </div>
       <Button icon="pi pi-download" @click="downloadPic(url, name)" />
     </div>
@@ -65,5 +65,11 @@ export default {
       });
     },
   },
+  computed: {
+    displayName() {
+      const maxLength = 16; // 设置最大显示字符数
+      return this.name.length > maxLength ? this.name.slice(0, maxLength) + '...' : this.name;
+    }
+  }
 };
 </script>

@@ -37,13 +37,18 @@ const router = createRouter({
       ]
     },
     {
-      path: "/data",
+      path: "/util",
       component: AppLayout,
       children: [
         {
           path: "/util/moonPhoto",
           name: "moonPhoto",
           component: () => import("@/views/pages/util/MoonPhoto.vue")
+        },
+        {
+          path: "/util/cloudPhoto",
+          name: "cloudPhoto",
+          component: () => import("@/views/pages/util/CloudPhoto.vue")
         },
       ]
     },
