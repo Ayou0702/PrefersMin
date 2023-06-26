@@ -53,6 +53,27 @@ const router = createRouter({
       ]
     },
     {
+      path: "/auth",
+      children: [
+        {
+          path: "/auth/login",
+          name: "login",
+          component: () => import("@/views/pages/auth/Login.vue")
+        },
+      ]
+    },
+    {
+      path: "/controller",
+      component: AppLayout,
+      children: [
+        {
+          path: "/controller/permission",
+          name: "permission",
+          component: () => import("@/views/pages/controller/PermissionController.vue")
+        },
+      ]
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "notFound",
       component: () => import("@/views/pages/NotFound.vue")

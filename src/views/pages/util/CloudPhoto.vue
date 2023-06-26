@@ -89,13 +89,16 @@ function updateUrlList(type) {
       </div>
       <div class="flex ml-auto justify-content-end">
         <div class="p-inputgroup">
-          <Button type="button" v-if="urlList['wallpaper'].length > 0" label="壁纸" @click="updateUrlList('wallpaper')" />
-          <Button type="button" v-if="urlList['avatar'].length > 0" label="头像" @click="updateUrlList('avatar')" />
-          <Button type="button" v-if="urlList['liveWallpaper'].length > 0" label="动态壁纸" @click="updateUrlList('liveWallpaper')" />
-          <Button type="button" v-if="urlList['backgroundImage'].length > 0" label="背景图"
+          <Button v-if="urlList['wallpaper'].length > 0" label="壁纸" type="button"
+                  @click="updateUrlList('wallpaper')" />
+          <Button v-if="urlList['avatar'].length > 0" label="头像" type="button" @click="updateUrlList('avatar')" />
+          <Button v-if="urlList['liveWallpaper'].length > 0" label="动态壁纸" type="button"
+                  @click="updateUrlList('liveWallpaper')" />
+          <Button v-if="urlList['backgroundImage'].length > 0" label="背景图" type="button"
                   @click="updateUrlList('backgroundImage')" />
-          <Button type="button" v-if="urlList['toolPlay'].length > 0" label="工具玩法" @click="updateUrlList('toolPlay')" />
-          <Button type="button" v-if="urlList['ai'].length > 0" label="AI玩法" @click="updateUrlList('ai')" />
+          <Button v-if="urlList['toolPlay'].length > 0" label="工具玩法" type="button"
+                  @click="updateUrlList('toolPlay')" />
+          <Button v-if="urlList['ai'].length > 0" label="AI玩法" type="button" @click="updateUrlList('ai')" />
         </div>
       </div>
     </div>

@@ -9,6 +9,16 @@ const model = ref([
     items: [{ label: "仪表盘", icon: "pi pi-fw pi-home", to: "/" }],
   },
   {
+    label: "管理",
+    items: [
+      {
+        label: "权限管理",
+        icon: "pi pi-fw pi-images",
+        to: "/controller/permission",
+      },
+    ],
+  },
+  {
     label: "数据",
     items: [
       {
