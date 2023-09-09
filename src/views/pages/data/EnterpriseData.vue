@@ -93,6 +93,10 @@ function clearAllData() {
   update()
   clearAll.value = false;
 }
+
+function getData(dataName) {
+  return enterpriseDataList.value.find(data => data.dataName === dataName)
+}
 </script>
 
 <template>
@@ -102,36 +106,36 @@ function clearAllData() {
       <div class="card p-fluid">
         <h5>API配置</h5>
         <div class="formgrid grid">
-          <passwordInput :data="enterpriseDataList.find(data => data.dataName === 'tianApiKey')" />
+          <passwordInput :data="getData('tianApiKey')" />
         </div>
         <div class="formgrid grid">
-          <passwordInput :data="enterpriseDataList.find(data => data.dataName === 'amapKey')" />
+          <passwordInput :data="getData('amapKey')" />
         </div>
       </div>
 
       <div class="card p-fluid">
         <h5>调试数据</h5>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'debugPeriod')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'debugWeek')" />
+          <enterpriseDataForm :data="getData('debugPeriod')" />
+          <enterpriseDataForm :data="getData('debugWeek')" />
         </div>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'debugPushMode')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'debugUser')" />
+          <enterpriseDataForm :data="getData('debugPushMode')" />
+          <enterpriseDataForm :data="getData('debugUser')" />
         </div>
       </div>
 
       <div class="card p-fluid">
         <h5>推送数据</h5>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'departmentId')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'pushMode')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'dataSources')" />
+          <enterpriseDataForm :data="getData('departmentId')" />
+          <enterpriseDataForm :data="getData('pushMode')" />
+          <enterpriseDataForm :data="getData('dataSources')" />
         </div>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'url')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'imgUrl')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'weatherValue')" />
+          <enterpriseDataForm :data="getData('url')" />
+          <enterpriseDataForm :data="getData('imgUrl')" />
+          <enterpriseDataForm :data="getData('weatherValue')" />
         </div>
       </div>
     </div>
@@ -141,30 +145,30 @@ function clearAllData() {
       <div class="card p-fluid">
         <h5>企业微信</h5>
         <div class="formgrid grid">
-          <passwordInput :data="enterpriseDataList.find(data => data.dataName === 'corpId')" />
+          <passwordInput :data="getData('corpId')" />
         </div>
         <div class="formgrid grid">
-          <passwordInput :data="enterpriseDataList.find(data => data.dataName === 'agentId')" />
+          <passwordInput :data="getData('agentId')" />
         </div>
         <div class="formgrid grid">
-          <passwordInput :data="enterpriseDataList.find(data => data.dataName === 'secret')" />
+          <passwordInput :data="getData('secret')" />
         </div>
       </div>
 
       <div class="card p-fluid">
         <h5>统计数据</h5>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'classDays')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'morningClassDays')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'nightClassDays')" />
+          <enterpriseDataForm :data="getData('classDays')" />
+          <enterpriseDataForm :data="getData('morningClassDays')" />
+          <enterpriseDataForm :data="getData('nightClassDays')" />
         </div>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'totalClassTimes')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'totalSpecializedClassTimes')" />
+          <enterpriseDataForm :data="getData('totalClassTimes')" />
+          <enterpriseDataForm :data="getData('totalSpecializedClassTimes')" />
         </div>
         <div class="formgrid grid">
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'dateStarting')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'dateEnding')" />
+          <enterpriseDataForm :data="getData('dateStarting')" />
+          <enterpriseDataForm :data="getData('dateEnding')" />
         </div>
       </div>
 
