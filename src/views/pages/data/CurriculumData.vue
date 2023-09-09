@@ -299,6 +299,31 @@ const resetCurriculumData = () => {
   });
   resetCurriculumDataDialog.value = false;
 };
+
+function pushCourseData() {
+  request({
+    url: "/pushCourse",
+    method: "GET"
+  }).then((response) => {
+    if (response.data.code === 200) {
+      toast.add({
+        severity: "success",
+        summary: response.data.message,
+        detail: response.data.data,
+        life: 3000
+      });
+      getCurriculumData();
+    } else {
+      toast.add({
+        severity: "error",
+        summary: "重置失败",
+        detail: response.data.message,
+        life: 3000
+      });
+    }
+  });
+}
+
 const initFilters = () => {
   filters.value = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -352,6 +377,12 @@ const initFilters = () => {
               icon="pi pi-upload"
               label="导出课程推送队列"
               @click="exportCSV"
+            />
+            <Button
+              class="p-button-info mr-2"
+              icon="pi pi-bell"
+              label="手动推送课程数据"
+              @click="pushCourseData"
             />
           </template>
         </Toolbar>

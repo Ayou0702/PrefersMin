@@ -6,6 +6,7 @@ import enterpriseDataForm from "@/components/EnterpriseDataForm.vue";
 import passwordInput from "@/components/PasswordInput.vue";
 
 const toast = useToast();
+const clearAll = ref(false);
 
 let enterpriseDataList = ref([]);
 
@@ -83,6 +84,15 @@ function update() {
     }
   });
 }
+
+function clearAllData() {
+  enterpriseDataList.value.forEach(data => {
+    data.dataValue = "";
+  })
+
+  update()
+  clearAll.value = false;
+}
 </script>
 
 <template>
@@ -115,12 +125,13 @@ function update() {
         <h5>推送数据</h5>
         <div class="formgrid grid">
           <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'departmentId')" />
-          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'weatherValue')" />
           <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'pushMode')" />
+          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'dataSources')" />
         </div>
         <div class="formgrid grid">
           <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'url')" />
           <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'imgUrl')" />
+          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'weatherValue')" />
         </div>
       </div>
     </div>
@@ -143,6 +154,7 @@ function update() {
       <div class="card p-fluid">
         <h5>统计数据</h5>
         <div class="formgrid grid">
+          <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'classDays')" />
           <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'morningClassDays')" />
           <enterpriseDataForm :data="enterpriseDataList.find(data => data.dataName === 'nightClassDays')" />
         </div>
@@ -162,6 +174,7 @@ function update() {
           class="p-button-danger mr-2"
           icon="pi pi-trash"
           label="清空所有"
+          @click="clearAll = true"
         />
         <Button
           class="p-button-info mr-2"
@@ -180,6 +193,36 @@ function update() {
           @click="update"
         />
       </div>
+
+      <Dialog
+        v-model:visible="clearAll"
+        modal
+        class="w-3"
+      >
+        <template #header>
+          <div class="p-dialog-title">
+            你正在执行很危险的操作！
+          </div>
+        </template>
+        <div class="flex align-items-center justify-content-left mt-3">
+          <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
+          <span>你确认要清空<b>全部</b>的配置数据吗?</span>
+        </div>
+        <template #footer>
+          <Button
+            class="p-button-text"
+            icon="pi pi-times"
+            label="没有"
+            @click="clearAll = false"
+          />
+          <Button
+            class="p-button-text"
+            icon="pi pi-check"
+            label="是的"
+            @click="clearAllData"
+          />
+        </template>
+      </Dialog>
 
     </div>
   </div>
