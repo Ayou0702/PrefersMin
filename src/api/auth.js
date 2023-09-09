@@ -10,7 +10,7 @@ export default class authApi {
   login(userName, passWord) {
     return request.post("/auth/login", {
       userName: userName,
-      passWord: passWord,
+      passWord: passWord
     });
   }
 
@@ -41,7 +41,8 @@ export default class authApi {
             path: menu[i].children[j].path, // 访问路径
             name: menu[i].children[j].name, // 路由名称
             component: () =>
-              import("../view" + menu[i].children[j].component + ".vue"), // 组件路径
+              import(`../view/${menu[i].children[j].component}.vue`)
+            // import("../view" + menu[i].children[j].component + ".vue"), // 组件路径
           };
           routers.push(path);
           router.addRoute("Main", path);
@@ -51,7 +52,7 @@ export default class authApi {
         let path = {
           path: menu[i].path, // 访问路径
           name: menu[i].name, // 路由名称
-          component: "../view" + menu[i].component + ".vue", // 组件路径
+          component: "../view" + menu[i].component + ".vue" // 组件路径
         };
         routers.push(path);
         router.addRoute("Main", path);

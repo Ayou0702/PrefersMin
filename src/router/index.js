@@ -1,5 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import AppLayout from "@/layout/AppLayout.vue";
+import cookie from "js-cookie";
+import AuthApi from "../api/auth";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -33,6 +35,11 @@ const router = createRouter({
           path: "/data/scheduleData",
           name: "scheduleData",
           component: () => import("@/views/pages/data/ScheduleData.vue")
+        },
+        {
+          path: "/data/enterpriseData",
+          name: "enterpriseData",
+          component: () => import("@/views/pages/data/EnterpriseData.vue")
         },
       ]
     },
@@ -80,5 +87,19 @@ const router = createRouter({
     }
   ]
 });
-
+const authApi = new AuthApi();
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  // 进入到了无匹配的路由中
+  if (to.matched.length === 0) {
+    let menu = cookie.get("menu") ? JSON.parse(cookie.get("menu")):JSON.parse(localStorage.getItem("menu"))
+    authApi.analysisMenu(router,menu);
+    router.push({ path: to.path });
+  }
+  // 未登录用户只允许访问登录页
+  if (to.name !== "login" && cookie.get("tokenValue") == null) {
+    return next({ name: "login" });
+  }
+  next();
+});
 export default router;

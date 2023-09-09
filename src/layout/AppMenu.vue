@@ -36,6 +36,11 @@ const model = ref([
         icon: "pi pi-fw pi-table",
         to: "/data/scheduleData",
       },
+      {
+        label: "配置数据",
+        icon: "pi pi-fw pi-table",
+        to: "/data/enterpriseData",
+      },
     ],
   },
   {
