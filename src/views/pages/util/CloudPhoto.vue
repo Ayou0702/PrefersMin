@@ -62,8 +62,8 @@ async function download() {
       code: shibboleth.value
     }
   });
-  Object.keys(data.data).forEach((type) => {
-    urlList.value[type].push(...data.data[type]);
+  Object.keys(data.data.map).forEach((type) => {
+    urlList.value[type].push(...data.data.map[type]);
   });
 }
 

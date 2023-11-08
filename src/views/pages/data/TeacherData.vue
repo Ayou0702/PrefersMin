@@ -54,20 +54,13 @@ function getTeacherData() {
         });
       }
 
-      teacherDataList.value = response.data.data;
+      teacherDataList.value = response.data.data.teacherDataList;
 
       for (const teacherData of teacherDataList.value) {
         await getAvatar(teacherData.teacherId, "teacherAvatar")
           .then(response => {
             if (response.data.code === 200) {
-              avatarList.value[teacherData.teacherId - 1] = response.data.data;
-            } else {
-              toast.add({
-                severity: "warn",
-                summary: response.data.message,
-                detail: response.data.data,
-                life: 4000
-              });
+              avatarList.value[teacherData.teacherId - 1] = response.data.data.avatar;
             }
           })
           .catch(error => {
@@ -120,15 +113,15 @@ const saveProduct = () => {
           getTeacherData();
           toast.add({
             severity: "success",
-            summary: "修改成功",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.description,
             life: 3000
           });
         } else {
           toast.add({
             severity: "error",
-            summary: "修改失败",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -143,7 +136,7 @@ const saveProduct = () => {
           toast.add({
             severity: "success",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
           getTeacherData();
@@ -151,7 +144,7 @@ const saveProduct = () => {
           toast.add({
             severity: "error",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -193,7 +186,7 @@ const deleteSelectedProducts = (teacherId) => {
       toast.add({
         severity: "success",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
     } else {
@@ -233,14 +226,14 @@ function uploadAvatar(event) {
         toast.add({
           severity: "success",
           summary: response.data.message,
-          detail: response.data.data,
+          detail: response.data.description,
           life: 3000
         });
       } else {
         toast.add({
           severity: "error",
           summary: response.data.message,
-          detail: response.data.data,
+          detail: response.data.description,
           life: 3000
         });
       }

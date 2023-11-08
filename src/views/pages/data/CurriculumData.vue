@@ -48,7 +48,7 @@ onBeforeMount(async () => {
       life: 3000
     });
   } else {
-    courseData.value = courseResponse.data.data;
+    courseData.value = courseResponse.data.data.courseDataList;
     courseNameGroup.value.push({
       label: "专业课程",
       items: courseData.value.filter(item => item.courseSpecialized === true)
@@ -67,7 +67,7 @@ onBeforeMount(async () => {
       life: 3000
     });
   } else {
-    teacherData.value = teacherResponse.data.data;
+    teacherData.value = teacherResponse.data.data.teacherDataList;
     teacherNameGroup.value.push({
       label: "专业教师",
       items: teacherData.value.filter(item => item.teacherSpecialized === true)
@@ -112,7 +112,7 @@ function getCurriculumData() {
         });
       }
 
-      curriculumDataList.value = response.data.data;
+      curriculumDataList.value = response.data.data.curriculumDataList;
 
       const courseIdList = [
         ...new Set(curriculumDataList.value.map((item) => item.courseId))
@@ -122,14 +122,7 @@ function getCurriculumData() {
         await getAvatar(courseId, "courseAvatar")
           .then(response => {
             if (response.data.code === 200) {
-              avatarList.value[courseId - 1] = response.data.data;
-            } else {
-              toast.add({
-                severity: "warn",
-                summary: response.data.message,
-                detail: response.data.data,
-                life: 3000
-              });
+              avatarList.value[courseId - 1] = response.data.data.avatar;
             }
           })
           .catch(error => {
@@ -184,15 +177,15 @@ const saveProduct = () => {
           getCurriculumData();
           toast.add({
             severity: "success",
-            summary: "修改成功",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.description,
             life: 3000
           });
         } else {
           toast.add({
             severity: "error",
-            summary: "错误",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -207,7 +200,7 @@ const saveProduct = () => {
           toast.add({
             severity: "success",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
           getCurriculumData();
@@ -215,7 +208,7 @@ const saveProduct = () => {
           toast.add({
             severity: "error",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -257,14 +250,14 @@ const deleteSelectedProducts = (curriculumId) => {
       toast.add({
         severity: "success",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
     } else {
       toast.add({
         severity: "error",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
     }
@@ -284,15 +277,15 @@ const resetCurriculumData = () => {
       toast.add({
         severity: "success",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
       getCurriculumData();
     } else {
       toast.add({
         severity: "error",
-        summary: "重置失败",
-        detail: response.data.message,
+        summary: response.data.message,
+        detail: response.data.description,
         life: 3000
       });
     }
@@ -309,15 +302,14 @@ function pushCourseData() {
       toast.add({
         severity: "success",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
-      getCurriculumData();
     } else {
       toast.add({
         severity: "error",
-        summary: "重置失败",
-        detail: response.data.message,
+        summary: response.data.message,
+        detail: response.data.description,
         life: 3000
       });
     }
@@ -423,10 +415,13 @@ const initFilters = () => {
             <template #body="slotProps">
               <div class="flex ml-5 flex-row">
                 <Avatar
+                  v-if="avatarList[slotProps.data.courseId - 1]"
                   :image="avatarList[slotProps.data.courseId - 1]"
                   shape="circle"
                   size="xlarge"
                 />
+                <Avatar v-else :label="slotProps.data.courseName.charAt(0)" class="mr-2" shape="circle"
+                        size="xlarge"></Avatar>
                 <div
                   class="ml-1 text-left pl-3 justify-content-center flex-column flex"
                 >

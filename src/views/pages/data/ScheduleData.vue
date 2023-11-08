@@ -42,7 +42,7 @@ onBeforeMount(async () => {
       life: 3000
     });
   } else {
-    courseData.value = courseResponse.data.data;
+    courseData.value = courseResponse.data.data.courseDataList;
     courseNameGroup.value.push({
       label: "专业课程",
       items: courseData.value.filter(item => item.courseSpecialized === true)
@@ -61,7 +61,7 @@ onBeforeMount(async () => {
       life: 3000
     });
   } else {
-    teacherData.value = teacherResponse.data.data;
+    teacherData.value = teacherResponse.data.data.teacherDataList;
     teacherNameGroup.value.push({
       label: "专业教师",
       items: teacherData.value.filter(item => item.teacherSpecialized === true)
@@ -106,7 +106,7 @@ function getScheduleData() {
         });
       }
 
-      scheduleDataList.value = response.data.data;
+      scheduleDataList.value = response.data.data.scheduleDataList;
 
       loading.value = false;
       return response;
@@ -164,15 +164,15 @@ const saveProduct = () => {
           getScheduleData();
           toast.add({
             severity: "success",
-            summary: "修改成功",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.description,
             life: 3000
           });
         } else {
           toast.add({
             severity: "error",
-            summary: "错误",
-            detail: response.data.message,
+            summary: response.data.message,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -187,7 +187,7 @@ const saveProduct = () => {
           toast.add({
             severity: "success",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
           getScheduleData();
@@ -195,7 +195,7 @@ const saveProduct = () => {
           toast.add({
             severity: "error",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -227,14 +227,14 @@ const deleteSelectedProducts = (scheduleId) => {
       toast.add({
         severity: "success",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
     } else {
       toast.add({
         severity: "error",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
     }

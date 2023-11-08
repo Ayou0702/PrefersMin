@@ -54,20 +54,13 @@ function getCourseData() {
         });
       }
 
-      courseDataList.value = response.data.data;
+      courseDataList.value = response.data.data.courseDataList;
 
       for (const courseData of courseDataList.value) {
         await getAvatar(courseData.courseId, "courseAvatar")
           .then(response => {
             if (response.data.code === 200) {
-              avatarList.value[courseData.courseId - 1] = response.data.data;
-            } else {
-              toast.add({
-                severity: "warn",
-                summary: response.data.message,
-                detail: response.data.data,
-                life: 4000
-              });
+              avatarList.value[courseData.courseId - 1] = response.data.data.avatar;
             }
           })
           .catch(error => {
@@ -123,14 +116,14 @@ const saveProduct = () => {
           toast.add({
             severity: "success",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
         } else {
           toast.add({
             severity: "error",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -145,7 +138,7 @@ const saveProduct = () => {
           toast.add({
             severity: "success",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
           getCourseData();
@@ -153,7 +146,7 @@ const saveProduct = () => {
           toast.add({
             severity: "error",
             summary: response.data.message,
-            detail: response.data.data,
+            detail: response.data.description,
             life: 3000
           });
         }
@@ -195,7 +188,7 @@ const deleteSelectedProducts = (courseId) => {
       toast.add({
         severity: "success",
         summary: response.data.message,
-        detail: response.data.data,
+        detail: response.data.description,
         life: 3000
       });
     } else {
@@ -235,14 +228,14 @@ function uploadAvatar(event) {
         toast.add({
           severity: "success",
           summary: response.data.message,
-          detail: response.data.data,
+          detail: response.data.description,
           life: 3000
         });
       } else {
         toast.add({
           severity: "error",
           summary: response.data.message,
-          detail: response.data.data,
+          detail: response.data.description,
           life: 3000
         });
       }
@@ -355,7 +348,7 @@ function uploadAvatar(event) {
                   shape="circle"
                   size="xlarge"
                 />
-                <Avatar v-else :label="slotProps.data.courseName.charAt(2)" class="mr-2" shape="circle"
+                <Avatar v-else :label="slotProps.data.courseName.charAt(0)" class="mr-2" shape="circle"
                         size="xlarge"></Avatar>
               </div>
             </template>

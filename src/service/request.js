@@ -28,4 +28,21 @@ service.interceptors.request.use(
     return Promise.reject(err);
   }
 );
+
+// 响应拦截器
+service.interceptors.response.use(
+  (res)=>{
+    let code = res.data.code  // 获取后端返回的状态码
+    if(code===401){           // token失效
+      cookie.remove('tokenValue'); // 移除cookie
+      cookie.remove('menu');
+      cookie.remove('loginAdmin');
+    }
+    return res;
+  },
+  (error)=>{
+    return Promise.reject(error);
+  }
+)
+
 export default service;

@@ -42,7 +42,7 @@ function getEnterpriseData() {
         });
       }
 
-      enterpriseDataList.value = response.data.data;
+      enterpriseDataList.value = response.data.data.enterpriseDataList;
 
       return response;
     })
@@ -70,15 +70,15 @@ function update() {
       getEnterpriseData();
       toast.add({
         severity: "success",
-        detail: response.data.message,
-        summary: "修改成功",
+        summary: response.data.message,
+        detail: response.data.description,
         life: 3000
       });
     } else {
       toast.add({
         severity: "error",
-        detail: response.data.message,
-        summary: "修改失败",
+        summary: response.data.message,
+        detail: response.data.description,
         life: 3000
       });
     }

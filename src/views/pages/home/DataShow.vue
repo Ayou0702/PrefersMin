@@ -66,7 +66,7 @@ function getStatisticalData() {
         <div class="flex justify-content-between mb-3">
           <div>
             <span class="block text-500 font-semibold mb-3">什么也没做就已经开学这么久了</span>
-            <div class="text-800 text-lg font-bold">今天是第 {{ statisticalDataList.dateStarting }} 天上课</div>
+            <div class="text-800 text-lg font-bold">开始第 {{ statisticalDataList.dateStarting }} 天的学习吧</div>
           </div>
           <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                style="width: 2.5rem; height: 2.5rem">
