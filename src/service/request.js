@@ -30,16 +30,19 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (res) => {
-    let code = res.data.code;  // 获取后端返回的状态码
-    if (code === 401) {           // token失效
-      cookie.remove("tokenValue"); // 移除cookie
-      cookie.remove("menu");
-      cookie.remove("loginAdmin");
+    // 获取后端返回的状态码
+    let code = res.data.code;
+    // 会话失效
+    if (code === 701) {
+      // 清除token
+      cookie.remove("tokenValue");
       // 页面跳转
       router.push({
         path: "/auth/login",
         query: {
-          message: "paramValue", // 要传递的参数名和值
+          code: code,
+          description: res.data.description,
+          message: res.data.message
         },
       });
     }

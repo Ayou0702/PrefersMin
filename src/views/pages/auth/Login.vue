@@ -2,15 +2,14 @@
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import request from "@/service/request";
 import cookie from "js-cookie";
-import { useRouter } from "vue-router";
-import AuthApi from "@/api/auth";
+import { useRouter,useRoute } from "vue-router";
 import axios from "axios";
 import { useToast } from "primevue/usetoast";
 
 // 路由实例
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
-const authApi = new AuthApi();
 const username = ref("");
 const password = ref("");
 const checked = ref(false);
@@ -19,10 +18,29 @@ let timer = reactive({});
 
 // 创建计时器
 onMounted(() => {
+  // 检查是否存在状态码
+  if ("code" in route.query) {
+
+    // Toast提示
+    toast.add({
+      severity: "error",
+      summary: route.query.description,
+      detail: route.query.message,
+      life: 3000
+    });
+
+    // 清空route.query
+    router.replace({ query: {} });
+  }
+
+  // 初始化一言
   updateYiyan();
+
+  // 定时执行
   timer = setInterval(() => {
     updateYiyan();
   }, 10000);
+
 });
 
 // 销毁计时器
