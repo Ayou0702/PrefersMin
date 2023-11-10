@@ -80,27 +80,10 @@ let login = async function() {
       if (res.data.code === 200 && res.data.data.tokenValue != null) {
         // 1.token存入cookie
         cookie.set("tokenValue", res.data.data.tokenValue);
-        // 2.通过token查询登录管理员的权限列表
-        request({
-          method: "GET",
-          url: "/auth/login_info"
-        })
-          .then((res) => {
-            if (res.data.code === 200) {
-              // 将权限列表存入cookie
-              cookie.set("menu", JSON.stringify(res.data.data.permissionList));
-              //防止cookie超4k补丁
-              localStorage.setItem("menu", JSON.stringify(res.data.data.permissionList));
-              cookie.set("loginAdmin", JSON.stringify(res.data.data.loginAdmin));
-              // 动态生成路由
-              console.log(res.data.data.permissionList);
-              authApi.analysisMenu(router, res.data.data.permissionList);
-              // 页面跳转
-              router.push({
-                path: "/"
-              });
-            }
-          });
+        // 页面跳转
+        router.push({
+          path: "/"
+        });
       } else if (res.data.code === 200) {
         // 访问成功但是返回值为空（用户名或密码错误）
         toast.add({
@@ -124,7 +107,7 @@ let login = async function() {
           <div class="text-center mb-5">
             <img alt="Image" class="mb-3" height="50" src="/../public/layout/images/logo.svg" />
             <div class="text-900 text-3xl font-bold mb-3">PrefersMin</div>
-            <div style="width: 340px">
+            <div style="width: 340px;height: 20px">
               <span class="text-600 font-bold ayou" style="transition: opacity 0.5s;">{{ yiyan }}</span>
             </div>
           </div>
