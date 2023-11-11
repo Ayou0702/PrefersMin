@@ -28,18 +28,17 @@ onBeforeMount(() => {
         severity: "success",
         summary: "数据加载成功",
         detail: response.data.message,
-        life: 3000
+        life: 3000,
       });
     }
   });
-
 });
 
 function getTeacherData() {
   loading.value = true;
   return request({
     url: "/getTeacherData",
-    method: "GET"
+    method: "GET",
   })
     .then(async (response) => {
       if (response.data.code !== 200) {
@@ -47,10 +46,10 @@ function getTeacherData() {
           severity: "error",
           summary: "数据加载失败",
           detail: response.data.message,
-          life: 3000
+          life: 3000,
         });
         return Promise.reject({
-          response: { data: { code: -1, message: response.data.message } }
+          response: { data: { code: -1, message: response.data.message } },
         });
       }
 
@@ -58,17 +57,18 @@ function getTeacherData() {
 
       for (const teacherData of teacherDataList.value) {
         await getAvatar(teacherData.teacherId, "teacherAvatar")
-          .then(response => {
+          .then((response) => {
             if (response.data.code === 200) {
-              avatarList.value[teacherData.teacherId - 1] = response.data.data.avatar;
+              avatarList.value[teacherData.teacherId - 1] =
+                response.data.data.avatar;
             }
           })
-          .catch(error => {
+          .catch((error) => {
             toast.add({
               severity: "error",
               summary: "网络错误",
               detail: error.message,
-              life: 3000
+              life: 3000,
             });
           });
       }
@@ -81,11 +81,11 @@ function getTeacherData() {
         severity: "error",
         summary: "网络异常",
         detail: error.message,
-        life: 3000
+        life: 3000,
       });
       // 失败情况下返回约定错误格式（例如 code 字段为 -1）
       return Promise.reject({
-        response: { data: { code: -1, message: error.message } }
+        response: { data: { code: -1, message: error.message } },
       });
     });
 }
@@ -100,14 +100,12 @@ const hideDialog = () => {
 };
 
 const saveProduct = () => {
-  if (
-    product.value.teacherName
-  ) {
+  if (product.value.teacherName) {
     if (product.value.teacherId) {
       request({
         url: "/updateTeacherData",
         method: "POST",
-        data: product.value
+        data: product.value,
       }).then((response) => {
         if (response.data.code === 200) {
           getTeacherData();
@@ -115,14 +113,14 @@ const saveProduct = () => {
             severity: "success",
             summary: response.data.message,
             detail: response.data.description,
-            life: 3000
+            life: 3000,
           });
         } else {
           toast.add({
             severity: "error",
             summary: response.data.message,
             detail: response.data.description,
-            life: 3000
+            life: 3000,
           });
         }
       });
@@ -130,14 +128,14 @@ const saveProduct = () => {
       request({
         url: "/addTeacherData",
         method: "POST",
-        data: product.value
+        data: product.value,
       }).then((response) => {
         if (response.data.code === 200) {
           toast.add({
             severity: "success",
             summary: response.data.message,
             detail: response.data.description,
-            life: 3000
+            life: 3000,
           });
           getTeacherData();
         } else {
@@ -145,7 +143,7 @@ const saveProduct = () => {
             severity: "error",
             summary: response.data.message,
             detail: response.data.description,
-            life: 3000
+            life: 3000,
           });
         }
       });
@@ -171,7 +169,7 @@ const exportCSV = () => {
     severity: "info",
     summary: "已将数据导出，请查看下载列表",
     detail: "若输出导出失败，请更换浏览器重试",
-    life: 3000
+    life: 3000,
   });
 };
 
@@ -179,7 +177,7 @@ const deleteSelectedProducts = (teacherId) => {
   request({
     url: "/deleteTeacherData",
     method: "POST",
-    data: teacherId
+    data: teacherId,
   }).then((response) => {
     if (response.data.code === 200) {
       getTeacherData();
@@ -187,7 +185,7 @@ const deleteSelectedProducts = (teacherId) => {
         severity: "success",
         summary: response.data.message,
         detail: response.data.description,
-        life: 3000
+        life: 3000,
       });
     } else {
       deleteProductsDialogFailed.value = true;
@@ -202,12 +200,11 @@ const deleteSelectedProducts = (teacherId) => {
 
 const initFilters = () => {
   filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   };
 };
 
 function uploadAvatar(event) {
-
   const formData = new FormData();
 
   formData.append("file", event.files[0]);
@@ -217,28 +214,26 @@ function uploadAvatar(event) {
   request({
     url: "/uploadAvatar",
     method: "POST",
-    data: formData
-  })
-    .then(response => {
-      hideDialog();
-      if (response.data.code === 200) {
-        getTeacherData();
-        toast.add({
-          severity: "success",
-          summary: response.data.message,
-          detail: response.data.description,
-          life: 3000
-        });
-      } else {
-        toast.add({
-          severity: "error",
-          summary: response.data.message,
-          detail: response.data.description,
-          life: 3000
-        });
-      }
-    });
-
+    data: formData,
+  }).then((response) => {
+    hideDialog();
+    if (response.data.code === 200) {
+      getTeacherData();
+      toast.add({
+        severity: "success",
+        summary: response.data.message,
+        detail: response.data.description,
+        life: 3000,
+      });
+    } else {
+      toast.add({
+        severity: "error",
+        summary: response.data.message,
+        detail: response.data.description,
+        life: 3000,
+      });
+    }
+  });
 }
 </script>
 
@@ -357,8 +352,13 @@ function uploadAvatar(event) {
                   shape="circle"
                   size="xlarge"
                 />
-                <Avatar v-else :label="slotProps.data.teacherName.charAt(0)" class="mr-2" shape="circle"
-                        size="xlarge"></Avatar>
+                <Avatar
+                  v-else
+                  :label="slotProps.data.teacherName.charAt(0)"
+                  class="mr-2"
+                  shape="circle"
+                  size="xlarge"
+                ></Avatar>
               </div>
             </template>
           </Column>
@@ -387,10 +387,7 @@ function uploadAvatar(event) {
               </div>
             </template>
           </Column>
-          <Column
-            header="编辑"
-            headerStyle="width:10%;min-width:10rem;"
-          >
+          <Column header="编辑" headerStyle="width:10%;min-width:10rem;">
             <template #body="slotProps">
               <div class="flex justify-content-center">
                 <Button
@@ -413,11 +410,7 @@ function uploadAvatar(event) {
           </Column>
         </DataTable>
 
-        <Dialog
-          v-model:visible="productDialog"
-          modal
-          class="p-fluid w-3"
-        >
+        <Dialog v-model:visible="productDialog" modal class="p-fluid w-3">
           <template #header>
             <div v-if="product.teacherId" class="p-dialog-title">
               修改教师数据
@@ -425,7 +418,7 @@ function uploadAvatar(event) {
             <div v-else class="p-dialog-title">新增教师数据</div>
           </template>
           <img
-            v-if="product.teacherId&&avatarList[product.teacherId - 1]"
+            v-if="product.teacherId && avatarList[product.teacherId - 1]"
             :alt="product.image"
             :src="avatarList[product.teacherId - 1]"
             class="mt-0 mx-auto mb-5 block shadow-2"
@@ -470,8 +463,15 @@ function uploadAvatar(event) {
           <template #footer>
             <div class="flex">
               <div v-if="product.teacherId" class="flex justify-content-start">
-                <FileUpload accept="image/*" auto chooseLabel="上传头像" class="p-button-text"
-                            customUpload mode="basic" @uploader="uploadAvatar($event)" />
+                <FileUpload
+                  accept="image/*"
+                  auto
+                  chooseLabel="上传头像"
+                  class="p-button-text"
+                  customUpload
+                  mode="basic"
+                  @uploader="uploadAvatar($event)"
+                />
               </div>
               <div class="flex ml-auto justify-content-end">
                 <Button
@@ -500,7 +500,7 @@ function uploadAvatar(event) {
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
             <span v-if="product"
-            >确认要删除教师名称为
+              >确认要删除教师名称为
               <b>{{ product.teacherName }} </b> 的教师数据吗?</span
             >
           </div>
@@ -520,11 +520,7 @@ function uploadAvatar(event) {
           </template>
         </Dialog>
 
-        <Dialog
-          v-model:visible="deleteProductsDialog"
-          modal
-          class="w-3"
-        >
+        <Dialog v-model:visible="deleteProductsDialog" modal class="w-3">
           <template #header>
             <div
               v-if="selectedProducts.length === teacherDataList.length"
@@ -532,19 +528,17 @@ function uploadAvatar(event) {
             >
               你正在执行很危险的操作！
             </div>
-            <div v-else class="p-dialog-title">
-              你确认要删除这些教师数据吗?
-            </div>
+            <div v-else class="p-dialog-title">你确认要删除这些教师数据吗?</div>
           </template>
           <div class="flex align-items-center justify-content-left mt-3">
             <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
             <span v-if="selectedProducts.length === teacherDataList.length"
-            >你确认要删除
+              >你确认要删除
               <b>全部(共{{ selectedProducts.length }}条记录)</b>
               的教师数据吗?</span
             >
             <span v-else
-            >你选中了
+              >你选中了
               <b>{{ selectedProducts.length }}</b>
               条记录<br />确认要删除这些教师数据吗?</span
             >
@@ -560,9 +554,13 @@ function uploadAvatar(event) {
               class="p-button-text"
               icon="pi pi-check"
               label="是的"
-              @click="deleteSelectedProducts(selectedProducts.map(
-        (selectedProduct) => selectedProduct.teacherId
-      ))"
+              @click="
+                deleteSelectedProducts(
+                  selectedProducts.map(
+                    (selectedProduct) => selectedProduct.teacherId
+                  )
+                )
+              "
             />
           </template>
         </Dialog>
@@ -576,8 +574,12 @@ function uploadAvatar(event) {
           <div class="flex justify-content-left mt-3 mr-5 ml-5">
             <i class="pi pi-exclamation-triangle text-3xl mr-6 mt-0" />
             <div>
-              <div v-for="message in deleteProductsDialogFailedMessage" class="font-bold text-lg text-center text-left">
-                {{ message }}<br><br></div>
+              <div
+                v-for="message in deleteProductsDialogFailedMessage"
+                class="font-bold text-lg text-center text-left"
+              >
+                {{ message }}<br /><br />
+              </div>
             </div>
           </div>
 

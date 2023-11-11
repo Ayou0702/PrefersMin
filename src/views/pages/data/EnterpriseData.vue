@@ -17,17 +17,16 @@ onBeforeMount(() => {
         severity: "success",
         summary: "数据加载成功",
         detail: response.data.message,
-        life: 3000
+        life: 3000,
       });
     }
   });
-
 });
 
 function getEnterpriseData() {
   return request({
     url: "/getEnterpriseData",
-    method: "GET"
+    method: "GET",
   })
     .then(async (response) => {
       if (response.data.code !== 200) {
@@ -35,10 +34,10 @@ function getEnterpriseData() {
           severity: "error",
           summary: "数据加载失败",
           detail: response.data.message,
-          life: 3000
+          life: 3000,
         });
         return Promise.reject({
-          response: { data: { code: -1, message: response.data.message } }
+          response: { data: { code: -1, message: response.data.message } },
         });
       }
 
@@ -51,11 +50,11 @@ function getEnterpriseData() {
         severity: "error",
         summary: "网络异常",
         detail: error.message,
-        life: 3000
+        life: 3000,
       });
       // 失败情况下返回约定错误格式（例如 code 字段为 -1）
       return Promise.reject({
-        response: { data: { code: -1, message: error.message } }
+        response: { data: { code: -1, message: error.message } },
       });
     });
 }
@@ -64,7 +63,7 @@ function update() {
   request({
     url: "/updateEnterpriseData",
     method: "POST",
-    data: enterpriseDataList.value
+    data: enterpriseDataList.value,
   }).then((response) => {
     if (response.data.code === 200) {
       getEnterpriseData();
@@ -72,30 +71,30 @@ function update() {
         severity: "success",
         summary: response.data.message,
         detail: response.data.description,
-        life: 3000
+        life: 3000,
       });
     } else {
       toast.add({
         severity: "error",
         summary: response.data.message,
         detail: response.data.description,
-        life: 3000
+        life: 3000,
       });
     }
   });
 }
 
 function clearAllData() {
-  enterpriseDataList.value.forEach(data => {
+  enterpriseDataList.value.forEach((data) => {
     data.dataValue = "";
-  })
+  });
 
-  update()
+  update();
   clearAll.value = false;
 }
 
 function getData(dataName) {
-  return enterpriseDataList.value.find(data => data.dataName === dataName)
+  return enterpriseDataList.value.find((data) => data.dataName === dataName);
 }
 </script>
 
@@ -141,7 +140,6 @@ function getData(dataName) {
     </div>
 
     <div class="col-12 md:col-6">
-
       <div class="card p-fluid">
         <h5>企业微信</h5>
         <div class="formgrid grid">
@@ -172,8 +170,7 @@ function getData(dataName) {
         </div>
       </div>
 
-      <div class="card  p-fluid flex justify-content-center">
-
+      <div class="card p-fluid flex justify-content-center">
         <Button
           class="p-button-danger mr-2"
           icon="pi pi-trash"
@@ -198,15 +195,9 @@ function getData(dataName) {
         />
       </div>
 
-      <Dialog
-        v-model:visible="clearAll"
-        modal
-        class="w-3"
-      >
+      <Dialog v-model:visible="clearAll" modal class="w-3">
         <template #header>
-          <div class="p-dialog-title">
-            你正在执行很危险的操作！
-          </div>
+          <div class="p-dialog-title">你正在执行很危险的操作！</div>
         </template>
         <div class="flex align-items-center justify-content-left mt-3">
           <i class="pi pi-exclamation-triangle mr-3 text-3xl" />
@@ -227,7 +218,6 @@ function getData(dataName) {
           />
         </template>
       </Dialog>
-
     </div>
   </div>
 </template>

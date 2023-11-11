@@ -102,7 +102,7 @@ import VirtualScroller from "primevue/virtualscroller";
 
 import "@/assets/styles.scss";
 
-import globalFunctionPlugin from '@/service/globalFunctionPlugin' //全局函数模块
+import globalFunctionPlugin from "@/service/globalFunctionPlugin"; //全局函数模块
 import VueVirtualScroller from "vue-virtual-scroller";
 
 const app = createApp(App);

@@ -3,11 +3,12 @@ import cookie from "js-cookie";
 import router from "./router";
 
 export const url = "http://localhost:8089";
+// export const url = "http://192.168.137.1:8089";
 
 // Axios 实例
 const service = axios.create({
   baseURL: url,
-  timeout: 10000 // 请求超时时间
+  timeout: 10000, // 请求超时时间
 });
 
 // 设置cross跨域 并设置访问权限 允许跨域携带cookie信息,使用JWT可关闭
@@ -42,7 +43,7 @@ service.interceptors.response.use(
         query: {
           code: code,
           description: res.data.description,
-          message: res.data.message
+          message: res.data.message,
         },
       });
     }

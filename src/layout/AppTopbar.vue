@@ -61,7 +61,6 @@ const isOutsideClicked = (event) => {
     topBarEl.contains(event.target)
   );
 };
-
 </script>
 
 <template>

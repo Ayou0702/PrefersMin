@@ -7,79 +7,67 @@ const shibboleth = ref("");
 const urlList = ref([]);
 
 function download() {
-
   urlList.value.length = 0;
   request({
     url: "https://xt.guxitk.com/api/merchant/authorByCode",
     method: "GET",
     params: {
-      code: shibboleth.value
+      code: shibboleth.value,
     },
     headers: {
-      "businessid": "1"
-    }
-  })
-    .then(response => {
+      businessid: "1",
+    },
+  }).then((response) => {
+    const author_id = response.data.data.codeInfo.author_id;
+    const user_id = response.data.data.codeInfo.user_id;
+    const merchant_id = response.data.data.codeInfo.merchant_id;
 
-      const author_id = response.data.data.codeInfo.author_id;
-      const user_id = response.data.data.codeInfo.user_id;
-      const merchant_id = response.data.data.codeInfo.merchant_id;
+    request({
+      url: "https://xt.guxitk.com/api/merchant/authorInfoById",
+      method: "GET",
+      params: {
+        merchant_id: merchant_id,
+        user_id: user_id,
+        id: author_id,
+        code: shibboleth.value,
+      },
+      headers: {
+        businessid: "1",
+      },
+    }).then((response) => {
+      const artworksType = ref([]);
 
-      request({
-        url: "https://xt.guxitk.com/api/merchant/authorInfoById",
-        method: "GET",
-        params: {
-          "merchant_id": merchant_id,
-          "user_id": user_id,
-          "id": author_id,
-          "code": shibboleth.value
-        },
-        headers: {
-          "businessid": "1"
-        }
-      })
-        .then(response => {
+      artworksType.value = response.data.data.artworksType;
 
-          const artworksType = ref([]);
+      artworksType.value.forEach((artworksType) => {
+        request({
+          // url: "https://xt.guxitk.com/api/artworks/albumListByAuthorId",
+          url: "https://xt.guxitk.com/api/artworks/artworksListByAuthorId",
+          method: "GET",
+          params: {
+            merchant_id: merchant_id,
+            user_id: user_id,
+            author_id: author_id,
+            pageNum: "1",
+            pageSize: "999",
+            sort_type: "1",
+            type: artworksType.id,
+          },
+          headers: {
+            businessid: "1",
+          },
+        }).then((response) => {
+          const records = ref([]);
 
-          artworksType.value = response.data.data.artworksType;
+          records.value = response.data.data.records;
 
-          artworksType.value.forEach(artworksType => {
+          const coverUrlList = records.value.map((record) => record.cover_url);
 
-            request({
-              // url: "https://xt.guxitk.com/api/artworks/albumListByAuthorId",
-              url: "https://xt.guxitk.com/api/artworks/artworksListByAuthorId",
-              method: "GET",
-              params: {
-                "merchant_id": merchant_id,
-                "user_id": user_id,
-                "author_id": author_id,
-                "pageNum": "1",
-                "pageSize": "999",
-                "sort_type": "1",
-                "type": artworksType.id
-              },
-              headers: {
-                "businessid": "1"
-              }
-            })
-              .then(response => {
-
-                const records = ref([]);
-
-                records.value = response.data.data.records;
-
-                const coverUrlList = records.value.map((record) => record.cover_url);
-
-                urlList.value.push(...coverUrlList);
-              });
-
-          });
-
+          urlList.value.push(...coverUrlList);
         });
-
+      });
     });
-
+  });
 }
 
 const show = ref(true);
@@ -94,11 +82,14 @@ const gutter = ref(20);
 const colWidth = ref(350);
 // 列数
 const cols = computed(() => {
-  return Math.floor((wrapperWidth.value - gutter.value) / (colWidth.value + gutter.value));
+  return Math.floor(
+    (wrapperWidth.value - gutter.value) / (colWidth.value + gutter.value)
+  );
 });
 // x偏移
 const offsetX = computed(() => {
-  const contextWidth = cols.value * (colWidth.value + gutter.value) + gutter.value;
+  const contextWidth =
+    cols.value * (colWidth.value + gutter.value) + gutter.value;
   return (wrapperWidth.value - contextWidth) / 2;
 });
 
@@ -115,7 +106,10 @@ function layout() {
     // 最小y的下标
     const minYIndex = posY.indexOf(minY);
     // 当前下标对应的x
-    const curX = gutter.value * (minYIndex + 1) + colWidth.value * minYIndex + offsetX.value;
+    const curX =
+      gutter.value * (minYIndex + 1) +
+      colWidth.value * minYIndex +
+      offsetX.value;
     // 设置偏移
     curItem.style.transform = `translate3d(${curX}px,${minY}px, 0)`;
     curItem.style.width = `${colWidth.value}px`;
@@ -126,7 +120,6 @@ function layout() {
 
   // 设置容器高度
   wrapperHeight.value = Math.max.apply(null, posY);
-
 }
 
 const imageLoad = () => {
@@ -141,7 +134,8 @@ const imageLoad = () => {
         <div class="p-inputgroup w-8 mr-3">
           <InputText
             v-model="shibboleth"
-            placeholder="输入你要批量下载的作者口令" />
+            placeholder="输入你要批量下载的作者口令"
+          />
           <Button label="检索" @click="download" />
         </div>
         <Button label="全部保存" @click="" />
@@ -150,7 +144,11 @@ const imageLoad = () => {
     <Divider />
 
     <perfect-scrollbar :disabled="show">
-      <div ref="waterfallWrapper" :style="{ height: `${wrapperHeight}px` }" style="position: relative;">
+      <div
+        ref="waterfallWrapper"
+        :style="{ height: `${wrapperHeight}px` }"
+        style="position: relative"
+      >
         <keep-alive>
           <div v-for="item in urlList" class="waterfall-item absolute">
             <PhotoView :url="item" @load="imageLoad" />

@@ -1,7 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import AppLayout from "@/layout/AppLayout.vue";
 import cookie from "js-cookie";
-import AuthApi from "../api/auth";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -13,9 +12,9 @@ const router = createRouter({
         {
           path: "/",
           name: "dashboard",
-          component: () => import("@/views/pages/home/Dashboard.vue")
-        }
-      ]
+          component: () => import("@/views/pages/home/Dashboard.vue"),
+        },
+      ],
     },
     {
       path: "/data",
@@ -24,24 +23,24 @@ const router = createRouter({
         {
           path: "/data/courseData",
           name: "courseData",
-          component: () => import("@/views/pages/data/CourseData.vue")
+          component: () => import("@/views/pages/data/CourseData.vue"),
         },
         {
           path: "/data/teacherData",
           name: "teacherData",
-          component: () => import("@/views/pages/data/TeacherData.vue")
+          component: () => import("@/views/pages/data/TeacherData.vue"),
         },
         {
           path: "/data/scheduleData",
           name: "scheduleData",
-          component: () => import("@/views/pages/data/ScheduleData.vue")
+          component: () => import("@/views/pages/data/ScheduleData.vue"),
         },
         {
           path: "/data/enterpriseData",
           name: "enterpriseData",
-          component: () => import("@/views/pages/data/EnterpriseData.vue")
+          component: () => import("@/views/pages/data/EnterpriseData.vue"),
         },
-      ]
+      ],
     },
     {
       path: "/util",
@@ -50,14 +49,14 @@ const router = createRouter({
         {
           path: "/util/moonPhoto",
           name: "moonPhoto",
-          component: () => import("@/views/pages/util/MoonPhoto.vue")
+          component: () => import("@/views/pages/util/MoonPhoto.vue"),
         },
         {
           path: "/util/cloudPhoto",
           name: "cloudPhoto",
-          component: () => import("@/views/pages/util/CloudPhoto.vue")
+          component: () => import("@/views/pages/util/CloudPhoto.vue"),
         },
-      ]
+      ],
     },
     {
       path: "/auth",
@@ -65,9 +64,14 @@ const router = createRouter({
         {
           path: "/auth/login",
           name: "login",
-          component: () => import("@/views/pages/auth/Login.vue")
+          component: () => import("@/views/pages/auth/Login.vue"),
         },
-      ]
+        {
+          path: "/auth/register",
+          name: "register",
+          component: () => import("@/views/pages/auth/Register.vue"),
+        },
+      ],
     },
     {
       path: "/controller",
@@ -76,30 +80,26 @@ const router = createRouter({
         {
           path: "/controller/permission",
           name: "permission",
-          component: () => import("@/views/pages/controller/PermissionController.vue")
+          component: () =>
+            import("@/views/pages/controller/PermissionController.vue"),
         },
-      ]
+      ],
     },
     {
       path: "/:pathMatch(.*)*",
       name: "notFound",
-      component: () => import("@/views/pages/NotFound.vue")
-    }
-  ]
+      component: () => import("@/views/pages/NotFound.vue"),
+    },
+  ],
 });
-const authApi = new AuthApi();
+
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  // 进入到了无匹配的路由中
-  if (to.matched.length === 0) {
-    let menu = cookie.get("menu") ? JSON.parse(cookie.get("menu")):JSON.parse(localStorage.getItem("menu"))
-    authApi.analysisMenu(router,menu);
-    router.push({ path: to.path });
-  }
   // 未登录用户只允许访问登录页
   if (to.name !== "login" && cookie.get("tokenValue") == null) {
     return next({ name: "login" });
   }
+
   next();
 });
 export default router;

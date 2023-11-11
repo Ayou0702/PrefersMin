@@ -14,18 +14,17 @@ const editProduct = (editProduct) => {
 onMounted(() => {
   request({
     url: "/permission/all",
-    method: "GET"
-  })
-    .then(res => {
-      treeTableValue.value = [update(...res.data.data.Menu)];
-      console.log(treeTableValue.value);
-    });
+    method: "GET",
+  }).then((res) => {
+    treeTableValue.value = [update(...res.data.data.Menu)];
+    console.log(treeTableValue.value);
+  });
 });
 
 function update(data) {
   console.log(data);
   if (data.children.length > 0) {
-    data.children.forEach(item => {
+    data.children.forEach((item) => {
       update(item);
     });
   }
@@ -44,8 +43,9 @@ function update(data) {
       gmtCreate: data.gmtCreate,
       gmtModified: data.gmtModified,
       level: data.level,
-      select: data.select
-    }, children: data.children.map(child => {
+      select: data.select,
+    },
+    children: data.children.map((child) => {
       return {
         data: {
           id: child.id,
@@ -61,17 +61,22 @@ function update(data) {
           gmtCreate: child.gmtCreate,
           gmtModified: child.gmtModified,
           level: child.level,
-          select: child.select
-        }, children: child.children
+          select: child.select,
+        },
+        children: child.children,
       };
-    })
+    }),
   };
 }
 
 function saveProduct() {
   console.log(product.value);
 }
-const selectButtonValues1 = ref([{ name: '导航',value:0 }, { name: '目录',value: 1 }, { name: '菜单',value: 2 }]);
+const selectButtonValues1 = ref([
+  { name: "导航", value: 0 },
+  { name: "目录", value: 1 },
+  { name: "菜单", value: 2 },
+]);
 </script>
 
 <template>
@@ -79,32 +84,29 @@ const selectButtonValues1 = ref([{ name: '导航',value:0 }, { name: '目录',va
     <h5>TreeTable</h5>
     <TreeTable :value="treeTableValue">
       <Column :expander="true" field="name" header="名称"></Column>
-      <Column field="icon" header="图标">
-
-      </Column>
+      <Column field="icon" header="图标"> </Column>
       <Column field="orderNum" header="排序"></Column>
       <Column field="type" header="菜单类型"></Column>
       <Column field="path" header="访问路径"></Column>
       <Column headerStyle="width: 10rem">
         <template #body="slotProps">
           <div class="flex flex-wrap gap-2">
-            <Button icon="pi pi-pencil" rounded severity="success" type="button"
-                    @click="editProduct(slotProps.node.data)" />
+            <Button
+              icon="pi pi-pencil"
+              rounded
+              severity="success"
+              type="button"
+              @click="editProduct(slotProps.node.data)"
+            />
             <Button icon="pi pi-search" rounded type="button" />
           </div>
         </template>
       </Column>
     </TreeTable>
 
-    <Dialog
-      v-model:visible="productDialog"
-      class="p-fluid w-3"
-      modal
-    >
+    <Dialog v-model:visible="productDialog" class="p-fluid w-3" modal>
       <template #header>
-        <div v-if="product.id" class="p-dialog-title">
-          修改菜单数据
-        </div>
+        <div v-if="product.id" class="p-dialog-title">修改菜单数据</div>
         <div v-else class="p-dialog-title">新增菜单数据</div>
       </template>
 
@@ -138,47 +140,38 @@ const selectButtonValues1 = ref([{ name: '导航',value:0 }, { name: '目录',va
       <div class="formgrid grid">
         <div class="field col">
           <label>名称</label>
-          <InputText
-            id="courseVenue"
-            v-model="product.name"
-          />
+          <InputText id="courseVenue" v-model="product.name" />
         </div>
         <div class="field col">
           <label>课程类别</label>
-          <SelectButton v-model="product.type" :options="selectButtonValues1" optionLabel="name" optionValue="value"/>
+          <SelectButton
+            v-model="product.type"
+            :options="selectButtonValues1"
+            optionLabel="name"
+            optionValue="value"
+          />
         </div>
       </div>
 
       <div class="formgrid grid">
         <div class="field col">
           <label>访问路径</label>
-          <InputText
-            id="path"
-            v-model="product.path"
-          />
+          <InputText id="path" v-model="product.path" />
         </div>
         <div class="field col">
           <label>组件路径</label>
-          <InputText
-            id="component"
-            v-model="product.component"
-          />
+          <InputText id="component" v-model="product.component" />
         </div>
       </div>
 
       <div class="formgrid grid">
         <div class="field col">
           <label>权限名称</label>
-          <InputText
-            id="quantity"
-            v-model="product.permissionValue"
-          />
+          <InputText id="quantity" v-model="product.permissionValue" />
         </div>
         <div class="field col">
           <label>图标</label>
-          <InputText
-            v-model="product.icon"
-          />
+          <InputText v-model="product.icon" />
         </div>
         <div class="field col">
           <label>菜单状态</label>
@@ -205,6 +198,4 @@ const selectButtonValues1 = ref([{ name: '导航',value:0 }, { name: '目录',va
       </template>
     </Dialog>
   </div>
-
-
 </template>
